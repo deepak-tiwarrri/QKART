@@ -1,6 +1,7 @@
 const express = require("express");
 const compression = require("compression");
 const cors = require("cors");
+// const mongoose = require('mongoose');
 const httpStatus = require("http-status");
 const routes = require("./routes/v1");
 const { errorHandler } = require("./middlewares/error");
@@ -8,7 +9,7 @@ const ApiError = require("./utils/ApiError");
 
 const app = express();
 
-
+// mongoose.connect('mongodb://127.0.0.1:27017/qkart')
 // parse json request body
 app.use(express.json());
 

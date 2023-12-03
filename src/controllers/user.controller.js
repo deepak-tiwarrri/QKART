@@ -39,8 +39,16 @@ const { userService } = require("../services");
  *
  */
 const getUser = catchAsync(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await userService.getUserById(userId);
+    if (result) return res.status(200).json(result);
+    else throw new ApiError(httpStatus.NOT_FOUND, "USER NOT FOUND",true);
+    // else return res.status(404).json({ message: "User not found" });
+  } catch (error) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "\"\"userId\"\" must be a valid mongo id",true)
+  }
 });
-
 
 module.exports = {
   getUser,
