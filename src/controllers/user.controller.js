@@ -39,15 +39,17 @@ const { userService } = require("../services");
  *
  */
 const getUser = catchAsync(async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const result = await userService.getUserById(userId);
-    if (result) return res.status(200).json(result);
-    else throw new ApiError(httpStatus.NOT_FOUND, "USER NOT FOUND",true);
-    // else return res.status(404).json({ message: "User not found" });
-  } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "\"\"userId\"\" must be a valid mongo id",true)
-  }
+  // try {
+    // const {userId} = req.params;
+    const userData = await userService.getUserById(req.params.userId);
+  
+    if(userData.email!==req.user.email)   throw new ApiError(httpStatus.FORBIDDEN, "User not Authenticated to see other user's data");
+    if(!userData) throw new ApiError(httpStatus.NOT_FOUND,"User not found");
+    else  return res.status(httpStatus.OK).json(userData);
+
+  // } catch (error) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, "\"\"userId\"\" must be a valid mongo id",true)
+  // }
 });
 
 module.exports = {

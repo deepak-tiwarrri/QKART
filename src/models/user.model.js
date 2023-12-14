@@ -1,7 +1,10 @@
+// const { genSalt } = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 // NOTE - "validator" external library and not the custom middleware at src/middlewares/validate.js
 const validator = require("validator");
 const config = require("../config/config");
+
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
 const userSchema = mongoose.Schema(
@@ -12,14 +15,14 @@ const userSchema = mongoose.Schema(
       trim: true,
     },
     email: {
-      type:String,
-      required:true,
-      trim:true,
-      unique:true,
-      lowercase:true,
-      validate(value){
-        if(!validator.isEmail(value)) throw new Error('Invalid Email');
-      }
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) throw new Error("Invalid Email");
+      },
     },
     password: {
       type: String,
@@ -32,14 +35,14 @@ const userSchema = mongoose.Schema(
       },
     },
     walletMoney: {
-      type:Number,
-      required:true,
-      default:config.default_wallet_money
+      type: Number,
+      required: true,
+      default: config.default_wallet_money,
     },
     address: {
       type: String,
-      unique:true,
-      trim:false,
+      unique: true,
+      trim: false,
       default: config.default_address,
     },
   },
@@ -56,15 +59,19 @@ const userSchema = mongoose.Schema(
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email) {
-  try {
-    const isEmail = await  this.findOne({email});
-    return Boolean(isEmail);   
-  } catch (error) {
-    throw error;
-  }
-  
+    const isEmail = await this.findOne({ email });
+    return Boolean(isEmail);
+
 };
 
+/**
+ * Check if entered password matches the user's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+userSchema.methods.isPasswordMatch = async function (password) {
+  return bcrypt.compare(password, this.password);
+};
 
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
@@ -76,5 +83,5 @@ userSchema.statics.isEmailTaken = async function (email) {
 /**
  * @typedef User
  */
-const User = mongoose.model('User',userSchema);
-module.exports = {User};
+const User = mongoose.model("User", userSchema);
+module.exports = { User };

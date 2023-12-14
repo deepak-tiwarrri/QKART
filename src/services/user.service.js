@@ -27,12 +27,12 @@ const getUserById = async(id)=>{
  * @returns {Promise<User>}
  */
 const getUserByEmail = async(email)=>{
-    try {
+    // try {
         const user = await User.findOne({email});
         return user;
-    } catch (error) {
-        throw error;
-    }
+    // } catch (error) {
+        // throw error;
+    // }
 }
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement createUser(user)
 /**
@@ -57,16 +57,17 @@ const getUserByEmail = async(email)=>{
  * 200 status code on duplicate email - https://stackoverflow.com/a/53144807
  */
 const createUser = async(user)=>{
-    try {
+    // try {
         const isEmailTaken = await User.isEmailTaken(user.email);
         if(isEmailTaken){
-            throw new ApiError(httpStatus.OK, 'Email already taken',true);
+            throw new ApiError(httpStatus.OK, 'Email already taken');
         }
-        const newUser = await User.create(user);
+        const hashedPassword = await bcrypt.hash(user.password,10);
+        const newUser = await User.create({...user,password:hashedPassword});
         return newUser;
-    } catch (error) {
-        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR,'Internal server error',true);
-    }
+    // } catch (error) {
+    //     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR,'Internal server error',true);
+    // }
 }
 module.exports = {createUser,getUserByEmail,getUserById};
 
