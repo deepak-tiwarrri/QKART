@@ -33,25 +33,102 @@ const { userService } = require("../services");
  *
  * Example response status codes:
  * HTTP 200 - If request successfully completes
+ * Request url - <workspace-ip>:8082/v1/users/6010008e6c3477697e8eaba3?q=address
+ * Response - 
+ * {
+ *   "address": "ADDRESS_NOT_SET"
+ * }
+ * 
+ *
+ * Example response status codes:
+ * HTTP 200 - If request successfully completes
+ * HTTP 403 - If request data doesn't match that of authenticated user
  * HTTP 404 - If user entity not found in DB
  * 
  * @returns {User | {address: String}}
  *
  */
-const getUser = catchAsync(async (req, res) => {
-  // try {
-    // const {userId} = req.params;
-    const userData = await userService.getUserById(req.params.userId);
-  
-    if(userData.email!==req.user.email)   throw new ApiError(httpStatus.FORBIDDEN, "User not Authenticated to see other user's data");
-    if(!userData) throw new ApiError(httpStatus.NOT_FOUND,"User not found");
-    else  return res.status(httpStatus.OK).json(userData);
+// const getUser = catchAsync(async (req, res) => {
+//   let data;
+//   if (req.query.q === "address") {
+//     data = await userService.getUserAddressById(req.params.userId);
+//   } else {
+//     data = await userService.getUserById(req.params.userId);
+//   }
 
-  // } catch (error) {
-  //   throw new ApiError(httpStatus.BAD_REQUEST, "\"\"userId\"\" must be a valid mongo id",true)
-  // }
+//   if (!data) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+//   }
+
+//   if (data.email != req.user.email) {
+//     throw new ApiError(
+//       httpStatus.FORBIDDEN,
+//       "User not authorized to access this resource"
+//     );
+//   }
+
+//   if (req.query.q === "address") {
+//     res.send({
+//       address: data.address,
+//     });
+//   } else {
+//     res.send(data);
+//   }
+// });
+
+
+const getUser = catchAsync(async (req, res) => {
+  let data;
+
+  if(req.query.q === "address"){
+    data = await userService.getUserAddressById(req.params.userId)
+  }
+  else{
+   data = await userService.getUserById(req.params.userId)
+  // console.log("Getuser",data)
+  // console.log(req,"Request user")
+  }
+
+
+  
+  if (data.email !== req.user.email){
+    throw new ApiError(httpStatus.FORBIDDEN, "User not Authenticated to see other user's data");
+  }
+
+  if(!data){
+    throw new ApiError(httpStatus.NOT_FOUND,"User Not Found")
+  }
+
+  if(req.query.q ==="address"){
+    res.send({
+      address:data.address
+    })
+  }
+  else{
+  res.send(data)
+  }
+});
+const setAddress = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.params.userId);
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  if (user.email != req.user.email) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "User not authorized to access this resource"
+    );
+  }
+
+  const address = await userService.setAddress(user, req.body.address);
+
+  res.send({
+    address: address,
+  });
 });
 
 module.exports = {
   getUser,
+  setAddress,
 };
