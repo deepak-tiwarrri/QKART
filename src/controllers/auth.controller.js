@@ -92,28 +92,14 @@ const login = catchAsync(async (req, res) => {
  
   const { email, password } = req.body;
 
-  // Check if email and password are provided
-  // if (!email || !password) {
-  //   return res.status(httpStatus.BAD_REQUEST).json({ code: httpStatus.BAD_REQUEST, message: "Email or password is missing" });
-  // }
-
   // try {
     // Attempt to log in the user with the provided credentials
     const user = await authService.loginUserWithEmailAndPassword(email, password);
     // If login is successful, generate authentication tokens
     const tokens = await tokenService.generateAuthTokens(user);
-    // if((email===user.email &&  password===user.password)){
-    //   // res.status(httpStatus.OK).json({code:httpStatus.OK,message:"Incorrect email or password"});
-    //   res.status(httpStatus.OK).json({user,tokens});
-    // }
-
-    // Return 200 status and user information along with tokens
-    // res.status(httpStatus.OK).json({ user, tokens });
+    
     res.status(httpStatus.OK).send({user,tokens});
-  // } catch (error) {
-  //   // If login fails (e.g., incorrect password), return 401 status
-  //   res.status(httpStatus.UNAUTHORIZED).json({ code: httpStatus.UNAUTHORIZED, message: "Incorrect email or password v1" });
-  // }
+ 
 });
 
 module.exports = {

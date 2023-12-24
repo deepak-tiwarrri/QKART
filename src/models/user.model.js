@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const config = require("../config/config");
 
-
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
 const userSchema = mongoose.Schema(
   {
@@ -59,9 +58,8 @@ const userSchema = mongoose.Schema(
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email) {
-    const isEmail = await this.findOne({ email });
-    return Boolean(isEmail);
-
+  const isEmail = await this.findOne({ email });
+  return Boolean(isEmail);
 };
 
 /**
@@ -73,6 +71,19 @@ userSchema.methods.isPasswordMatch = async function (password) {
   return bcrypt.compare(password, this.password);
 };
 
+/**
+ * Check if user have set an address other than the default address
+ * - should return true if user has set an address other than default address
+ * - should return false if user's address is the default address
+ *
+ * @returns {Promise<boolean>}
+ */
+userSchema.methods.hasSetNonDefaultAddress = async function () {
+  const user = this;
+  //will return true if provided user address is not matched with default
+  return user.address !== config.default_address;
+  // CRIO_SOLUTION_END_MODULE_TEST
+};
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
 /*

@@ -48,34 +48,6 @@ const { userService } = require("../services");
  * @returns {User | {address: String}}
  *
  */
-// const getUser = catchAsync(async (req, res) => {
-//   let data;
-//   if (req.query.q === "address") {
-//     data = await userService.getUserAddressById(req.params.userId);
-//   } else {
-//     data = await userService.getUserById(req.params.userId);
-//   }
-
-//   if (!data) {
-//     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-//   }
-
-//   if (data.email != req.user.email) {
-//     throw new ApiError(
-//       httpStatus.FORBIDDEN,
-//       "User not authorized to access this resource"
-//     );
-//   }
-
-//   if (req.query.q === "address") {
-//     res.send({
-//       address: data.address,
-//     });
-//   } else {
-//     res.send(data);
-//   }
-// });
-
 
 const getUser = catchAsync(async (req, res) => {
   let data;

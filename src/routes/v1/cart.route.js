@@ -21,6 +21,6 @@ router.put(
   validate(cartValidation.addProductToCart),
   cartController.updateProductInCart
 );
-
+router.put("/checkout",auth,cartController.checkout);
 
 module.exports = router;
