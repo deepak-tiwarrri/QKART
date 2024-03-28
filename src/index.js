@@ -9,7 +9,7 @@ app.use(cors());
 // const DB_URI = 'mongodb://127.0.0.1:27017/qkart';
 // let server;
 
-mongoose.connect(`${config.mongoose.url}`).then(()=>{
+mongoose.connect(config.mongoose.url, config.mongoose.options).then(()=>{
     console.log("Connected to DB at ",config.mongoose.url);
 },{ useNewUrlParser: true }).catch((error)=>{
     console.log("Failed to connect to DB at",error);

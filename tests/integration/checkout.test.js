@@ -31,7 +31,7 @@ describe("Cart routes", () => {
       const res = await request(app).put(`/v1/cart/checkout`).send();
 
       // Log response text to terminal
-      console.log(res.text);
+      // console.log(res.text);
 
       // TODO: CRIO_TASK_MODULE_TEST - Assert if status code is "401 UNAUTHORIZED"
       //  expect(true).toEqual(false);

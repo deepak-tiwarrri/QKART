@@ -28,6 +28,7 @@ const getUserById = async(id)=>{
  */
 const getUserByEmail = async(email)=>{
     // try {
+        console.log('services')
         const user = await User.findOne({email});
         return user;
     // } catch (error) {
@@ -58,12 +59,16 @@ const getUserByEmail = async(email)=>{
  */
 const createUser = async(user)=>{
     // try {
+        console.log('createUser');
         const isEmailTaken = await User.isEmailTaken(user.email);
+        console.log(isEmailTaken);
         if(isEmailTaken){
             throw new ApiError(httpStatus.OK, 'Email already taken');
         }
         const hashedPassword = await bcrypt.hash(user.password,10);
-        const newUser = await User.create({...user,password:hashedPassword});
+        console.log('hash', hashedPassword);
+        const newUser = await User.create({...user, password:hashedPassword});
+        console.log("newUser",newUser);
         return newUser;
     // } catch (error) {
     //     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR,'Internal server error',true);

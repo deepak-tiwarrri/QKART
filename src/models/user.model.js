@@ -40,7 +40,6 @@ const userSchema = mongoose.Schema(
     },
     address: {
       type: String,
-      unique: true,
       trim: false,
       default: config.default_address,
     },
