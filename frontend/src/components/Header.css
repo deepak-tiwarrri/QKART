@@ -1,37 +1,27 @@
 .header {
-  position: fixed;
-  top: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 2;
-  width: 100%;
-  padding: 0.75em 2em;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
-  background: #ffffff;
-  height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    height: 5vh;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
+    background: #ffffff;
 }
 
-.profile-image {
-  height: 30px;
-  padding-right: 0.5em;
+.username-text {
+    display: none;
 }
 
 .header-title {
-  font-size: 1.5em;
-  cursor: pointer;
+    cursor: pointer;
 }
 
-.header-action {
-  display: flex;
-  align-items: center;
+.explore-button {
+    color: #00a278 !important;
 }
 
-.header-info {
-  padding-right: 2em;
-}
-.header-link {
-  padding: 0em 1em;
-  cursor: pointer;
-  color: #1890ff;
+@media screen and (min-width: 768px) {
+    .username-text {
+        display: block;
+    }
 }
