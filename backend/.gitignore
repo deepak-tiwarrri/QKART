@@ -125,3 +125,8 @@ frontend/node_modules
 frontend/node_modules/
 # Local Netlify folder
 .netlify
+node_modules
+node_modules/
+db/users.db
+yarn.lock
+/node_modules
