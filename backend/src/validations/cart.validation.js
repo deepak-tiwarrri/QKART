@@ -3,7 +3,7 @@ const { objectId } = require("./custom.validation");
 
 const addProductToCart = {
   body: Joi.object().keys({
-    productId: Joi.string().required().custom(objectId),
+    productId: Joi.string().required(),
     quantity: Joi.number(),
     qty: Joi.number(),
   }).or('quantity', 'qty'),
