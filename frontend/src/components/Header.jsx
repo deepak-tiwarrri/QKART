@@ -1,102 +1,109 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Avatar, Button, Stack } from "@mui/material";
-import Box from "@mui/material/Box";
-import React from "react";
-import { Link, useHistory } from "react-router-dom";
-import { useMantineColorScheme, ActionIcon } from '@mantine/core';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import { ActionIcon, Avatar, Box, Button, Container, Group, Text } from "@mantine/core";
+import React from "react";
+import { Link, useHistory } from "react-router-dom";
+import { useMantineColorScheme } from '@mantine/core';
 import "./Header.css";
 
 const Header = ({ children, hasHiddenAuthButtons }) => {
   const history = useHistory();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
- 
-  
-  const routeToExplore=()=>{
+  const userEmail = localStorage.getItem("email") || "profile";
+
+  const routeToExplore = () => {
     history.push("/");
   }
-  const routeToRegister = ()=>{
+  const routeToRegister = () => {
     history.push("/register");
   }
 
-  const routeToLogin = ()=>{
+  const routeToLogin = () => {
     history.push("/login");
   }
-  
-  const logOut=()=>{
-    //clear the data
+
+  const logOut = () => {
     localStorage.removeItem('email');
     localStorage.removeItem('token');
     localStorage.removeItem('balance');
 
-    //redirect to login page
     history.push('/login');
     window.location.reload();
   }
 
-  if(hasHiddenAuthButtons){
+  const renderActions = () => (
+    <Group gap="sm" wrap="nowrap" className="header-actions">
+      <ActionIcon
+        variant="outline"
+        color={dark ? 'yellow' : 'blue'}
+        onClick={() => toggleColorScheme()}
+        title="Toggle color scheme"
+      >
+        {dark ? <LightModeIcon /> : <DarkModeIcon />}
+      </ActionIcon>
+      {localStorage.getItem("email") ? (
+        <>
+          <Avatar radius="xl" alt={userEmail} src="avatar.png" name={userEmail} />
+          <Text className="username-text" size="sm" fw={500}>{userEmail}</Text>
+          <Button variant="default" onClick={logOut}>Logout</Button>
+        </>
+      ) : (
+        <>
+          <Button variant="default" onClick={routeToLogin}>Login</Button>
+          <Button variant="filled" color="blue" onClick={routeToRegister}>Register</Button>
+        </>
+      )}
+    </Group>
+  );
+
+  if (hasHiddenAuthButtons) {
     return (
-      <Box className="header">
-        <Box className="header-title">
-        <Link to="/">
-            <img src="logo_light.svg" alt="QKart-icon"></img>
-        </Link>
-        </Box>
-        {children}
-        <Stack direction="row" spacing={1} alignItems="center">
-          <ActionIcon
-            variant="outline"
-            color={dark ? 'yellow' : 'blue'}
-            onClick={() => toggleColorScheme()}
-            title="Toggle color scheme"
-          >
-            {dark ? <LightModeIcon /> : <DarkModeIcon />}
-          </ActionIcon>
-          <Button
-            className="explore-button"
-            startIcon={<ArrowBackIcon />} onClick={routeToExplore}
-            variant="text"
-          >
-            Back to explore
-          </Button>
-        </Stack>
+      <Box component="header" className="header">
+        <Container size="xl" className="header-inner">
+          <Box className="header-title">
+            <Link to="/">
+              <img src="logo_light.svg" alt="QKart logo" className="header-logo" />
+            </Link>
+          </Box>
+          {children ? <Box className="header-center">{children}</Box> : null}
+          <Group gap="sm" wrap="nowrap" className="header-actions">
+            <ActionIcon
+              variant="outline"
+              color={dark ? 'yellow' : 'blue'}
+              onClick={() => toggleColorScheme()}
+              title="Toggle color scheme"
+            >
+              {dark ? <LightModeIcon /> : <DarkModeIcon />}
+            </ActionIcon>
+            <Button
+              className="explore-button"
+              leftSection={<ArrowBackIcon fontSize="small" />}
+              onClick={routeToExplore}
+              variant="subtle"
+            >
+              Back to explore
+            </Button>
+          </Group>
+        </Container>
       </Box>
     );
   }
-    return (
-      <Box className="header">
+
+  return (
+    <Box component="header" className="header">
+      <Container size="xl" className="header-inner">
         <Box className="header-title">
           <Link to="/">
-            <img src="logo_light.svg" alt="QKart-icon"></img>
+            <img src="logo_light.svg" alt="QKart logo" className="header-logo" />
           </Link>
         </Box>
-        {children}
-        <Stack direction="row" spacing={1} alignItems="center">
-          <ActionIcon
-            variant="outline"
-            color={dark ? 'yellow' : 'blue'}
-            onClick={() => toggleColorScheme()}
-            title="Toggle color scheme"
-          >
-            {dark ? <LightModeIcon /> : <DarkModeIcon />}
-          </ActionIcon>
-          {localStorage.getItem("email")?(
-            <>
-            <Avatar src="avatar.png" alt={localStorage.getItem("email") || "profile"}/>
-            <p className="username-text">{localStorage.getItem("email")}</p>
-            <Button type="primary" onClick={logOut}>Logout</Button>
-            </>
-          ):(
-            <>
-            <Button onClick={routeToLogin}>Login</Button>
-            <Button onClick={routeToRegister} variant="contained">Register</Button>
-            </>
-          )}
-        </Stack>
-      </Box>
-    );
+        {children ? <Box className="header-center">{children}</Box> : null}
+        {renderActions()}
+      </Container>
+    </Box>
+  );
 };
 
 export default Header;

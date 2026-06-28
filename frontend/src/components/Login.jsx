@@ -48,28 +48,28 @@ const Login = () => {
    *
    */
   const login = async (formData) => {
-    if(!validateInput(formData)) return;
+    if (!validateInput(formData)) return;
     setLoading(true);
-    try{
-      const response = await axios.post(`${config.endpoint}/auth/login`,formData);
+    try {
+      const response = await axios.post(`${config.endpoint}/auth/login`, formData);
       console.log(`response from login:`, response);
       const { user, tokens } = response?.data;
       const { email, walletMoney } = user;
-      persistLogin(tokens?.access?.token,email,walletMoney);
-
+      persistLogin(tokens?.access?.token, email, walletMoney);
       setFormData({
-        email:"",
-        password:""
+        email: "",
+        password: ""
       });
       setLoading(false);
       toast.success("Logged in successfully");
       history.push("/");
-    }catch(e){
+    } catch (e) {
       setLoading(false);
-      if(e.response && e.response.status===400)
-        toast.error(e.response.data.message);
-      else
-        toast.error("Something went wrong. Check that the backend is running, reachable and returns the valid JSON.");
+      if (e.response && e.response.status === 400)
+        toast.error(e?.response?.data?.message);
+      else {
+        toast.error(e?.response?.data?.message);
+      }
     }
   };
 
@@ -89,11 +89,11 @@ const Login = () => {
    * -    Check that password field is not an empty value - "Password is a required field"
    */
   const validateInput = (data) => {
-    if(!data.email){
+    if (!data.email) {
       toast.error("Email is a required field");
       return false;
     }
-    if(!data.password){
+    if (!data.password) {
       toast.error("Password is a required field");
       return false;
     }

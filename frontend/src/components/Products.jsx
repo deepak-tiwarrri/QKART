@@ -1,12 +1,23 @@
-import { Search, SentimentDissatisfied } from "@mui/icons-material";
+// import { Search, SentimentDissatisfied } from "@mui/icons-material";
 import {
   CircularProgress,
-  Grid,
   InputAdornment,
   TextField,
   Typography,
 } from "@mui/material";
-import { Box } from "@mui/system";
+import {
+  Grid,
+  SimpleGrid,
+  Box,
+  TextInput,
+  Loader,
+  Text,
+  Stack,
+  Center,
+  Container
+} from '@mantine/core';
+import Search from '@mui/icons-material/Search';
+import SentimentVeryDissatisfied from '@mui/icons-material/SentimentVeryDissatisfied';
 import axios from "axios";
 import { toast } from "react-toastify";
 import React, { useEffect, useState } from "react";
@@ -15,7 +26,7 @@ import Footer from "./Footer";
 import Header from "./Header";
 import "./Products.css";
 import ProductCard from "./ProductCard";
-import Cart, {generateCartItemsFrom, getTotalCartValue} from './Cart'
+import Cart, { generateCartItemsFrom, getTotalCartValue } from './Cart'
 
 // Definition of Data Structures used
 /**
@@ -39,10 +50,10 @@ import Cart, {generateCartItemsFrom, getTotalCartValue} from './Cart'
 const Products = () => {
   let timerId;
   //const [fetchedCart,setFetchedCart]= useState([]);
-  const [productData,setProductData] = useState([]);
+  const [productData, setProductData] = useState([]);
   const [isLoaded, setLoaded] = useState(false);
-  const [items,setItems]=useState([]);
-  let token=localStorage.getItem('token');
+  const [items, setItems] = useState([]);
+  let token = localStorage.getItem('token');
   // TODO: CRIO_TASK_MODULE_PRODUCTS - Fetch products data and store it
   /**
    * Make API call to get the products list and store it to display the products
@@ -87,16 +98,16 @@ const Products = () => {
       console.log("response from /products", res);
       setProductData(res.data);
       setLoaded(true);
-      if(token!==null){
+      if (token !== null) {
         let getData = await fetchCart(token);
         console.log("response from /cart", getData);
         //setFetchedCart(getData);
-        let cartData=generateCartItemsFrom(getData,res.data);
+        let cartData = generateCartItemsFrom(getData, res.data);
         //console.log(cartData)
         setItems(cartData)
         getTotalCartValue(cartData)
       }
-    } 
+    }
     catch (err) {
       toast.error(
         "Something went wrong. Check the backend console for more details"
@@ -118,13 +129,13 @@ const Products = () => {
    *
    */
   const performSearch = async (text) => {
-    try{
-    let products=await axios.get(`${config.endpoint}/products/search?value=${text}`)
-    setProductData(products.data)
-   // console.log(products);
+    try {
+      let products = await axios.get(`${config.endpoint}/products/search?value=${text}`)
+      setProductData(products.data)
+      // console.log(products);
     }
-    catch(err){
-     // console.log(err.toString())
+    catch (err) {
+      // console.log(err.toString())
       setProductData([])
     }
   };
@@ -142,8 +153,8 @@ const Products = () => {
    *
    */
   const debounceSearch = (event, debounceTimeout) => {
-    if(timerId) clearTimeout(timerId)
-    timerId=setTimeout(()=>{performSearch(event)},debounceTimeout)
+    if (timerId) clearTimeout(timerId)
+    timerId = setTimeout(() => { performSearch(event) }, debounceTimeout)
   };
 
   /**
@@ -174,14 +185,14 @@ const Products = () => {
    *      "message": "Protected route, Oauth2 Bearer token not found"
    * }
    */
-  
+
 
   const fetchCart = async (token) => {
     if (!token) return;
 
     try {
       // TODO: CRIO_TASK_MODULE_CART - Pass Bearer token inside "Authorization" header to get data from "GET /cart" API and return the response data
-      let res= await axios.get(`${config.endpoint}/cart`,{headers:{'Authorization': `Bearer ${token}`}})
+      let res = await axios.get(`${config.endpoint}/cart`, { headers: { 'Authorization': `Bearer ${token}` } })
       return res.data
     } catch (e) {
       if (e.response && e.response.status === 404) {
@@ -198,7 +209,7 @@ const Products = () => {
     }
   };
   //eslint-disable-next-line
-  useEffect(()=>{performAPICall()},[])
+  useEffect(() => { performAPICall() }, [])
 
 
   // TODO: CRIO_TASK_MODULE_CART - Return if a product already exists in the cart
@@ -216,7 +227,7 @@ const Products = () => {
    */
   const isItemInCart = (items, productId) => {
     //console.log(items,productId)
-    let data= items.filter(ele=> ele.productId===productId?true:false)
+    let data = items.filter(ele => ele.productId === productId ? true : false)
     //console.log(data);
     return data;
   };
@@ -265,101 +276,127 @@ const Products = () => {
     qty,
     options = { preventDuplicate: false }
   ) => {
-    if(token===null) toast.error('Login to add an item to the Cart')
-    else if(options.preventDuplicate && isItemInCart(items,productId).length>0) toast.warn('Item already in cart. Use the cart sidebar to update quantity or remove item.')
-    else{
-      try{
-      let res= await axios.post(`${config.endpoint}/cart`,{'productId':productId,'qty':qty},{headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'}})
-      //setFetchedCart(res.data)
-      let cartData=generateCartItemsFrom(res.data,products);
-      setItems(cartData)
-      getTotalCartValue(cartData)
-    }
-    catch(err){
+    if (token === null) toast.error('Login to add an item to the Cart')
+    else if (options.preventDuplicate && isItemInCart(items, productId).length > 0) toast.warn('Item already in cart. Use the cart sidebar to update quantity or remove item.')
+    else {
+      try {
+        let res = await axios.post(`${config.endpoint}/cart`, { 'productId': productId, 'qty': qty }, { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } })
+        //setFetchedCart(res.data)
+        let cartData = generateCartItemsFrom(res.data, products);
+        setItems(cartData)
+        getTotalCartValue(cartData)
+      }
+      catch (err) {
         toast.error(err?.response?.data?.message || "Failed to add item to cart")
+      }
     }
-  }
   };
 
   return (
-    <div>
-      <Header children={
-        (<div className='search'><TextField
-          className="search-desktop"
-          size="small"
-          fullWidth
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Search color="primary" />
-              </InputAdornment>
-            ),
-          }}
-          placeholder="Search for items/categories"
-          name="search"
-          onChange={(e)=>{debounceSearch(e.target.value,500)}}
-        />
-        </div>)
-      } hasHiddenAuthButtons={false} />
+    <Box bg="var(--mantine-color-body)" style={{ minHeight: '100vh' }}>
+      {/* Header with Integrated Desktop Search */}
+      <Header hasHiddenAuthButtons={false}>
+        <div className="search-desktop">
+          <TextInput
+            placeholder="Search for items/categories"
+            size="md"
+            radius="md"
+            leftSection={<Search size={18} stroke={1.5} />}
+            onChange={(e) => debounceSearch(e.target.value, 500)}
+            w={{ base: '100%', sm: 350, md: 450 }}
+          />
+        </div>
+      </Header>
 
-      <TextField
-        className="search-mobile"
-        size="small"
-        fullWidth
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <Search color="primary" />
-            </InputAdornment>
-          ),
-        }}
-        placeholder="Search for items/categories"
-        name="search"
-        onChange={(e)=>{debounceSearch(e.target.value,500)}}
-      />
-      <Grid container>
-        <Grid item md={localStorage.getItem('email')?8:12} xs={12}>
-            <Grid container>
-              <Grid item className="product-grid">
-                <Box className="hero">
-                  <p className="hero-heading">
-                    India’s <span className="hero-highlight">FASTEST DELIVERY</span>
-                    to your door step
-                  </p>
-                </Box>
-              </Grid>
-            </Grid>
-            {
-            isLoaded?
-            (productData.length!==0?<Grid container spacing={2} sx={{padding:'3rem 1rem'}}>
-              {productData.map((item)=>
-              (<Grid item xs={6} md={3} key={item._id}>
-                <ProductCard
-                  product={item} handleAddToCart ={()=>addToCart(token,items,productData,item._id,1,{ preventDuplicate: true })}
+      {/* Mobile Only Search Bar (Visible only on small screens via CSS/Styles) */}
+      <Container size="xl" className="search-mobile" mt="md">
+        <TextInput
+          placeholder="Search for items/categories"
+          size="md"
+          radius="md"
+          leftSection={<Search size={18} stroke={1.5} />}
+          onChange={(e) => debounceSearch(e.target.value, 500)}
+        />
+      </Container>
+
+      {/* Main Page Layout Container */}
+      <Container size="xl" py="xl">
+        <Grid gutter="xl">
+
+          {/* Left Column: Hero & Products Grid */}
+          <Grid.Col span={{ base: 12, md: localStorage.getItem('email') ? 8 : 12 }}>
+            <Stack gap="xl">
+
+              {/* Hero Section Banner */}
+              <Box className="hero" p="xl" style={{ borderRadius: 'var(--mantine-radius-md)' }}>
+                <Text className="hero-heading" size="xl" fw={700}>
+                  India’s <span className="hero-highlight">FASTEST DELIVERY</span> to your door step
+                </Text>
+              </Box>
+
+              {/* Content States: Loading vs. Results vs. Empty */}
+              {!isLoaded ? (
+                /* Loading State */
+                <Center minHeight="50vh">
+                  <Stack align="center" gap="sm">
+                    <Loader size="xl" type="dots" />
+                    <Text c="dimmed" fw={500}>Loading Products...</Text>
+                  </Stack>
+                </Center>
+              ) : productData.length > 0 ? (
+                /* Products Grid View */
+                <SimpleGrid
+                  cols={{ base: 2, sm: 3, md: localStorage.getItem('email') ? 3 : 4 }}
+                  spacing="lg"
+                  verticalSpacing="lg"
+                >
+                  {productData.map((item) => (
+                    <ProductCard
+                      key={item._id}
+                      product={item}
+                      handleAddToCart={() => addToCart(token, items, productData, item._id, 1, { preventDuplicate: true })}
+                    />
+                  ))}
+                </SimpleGrid>
+              ) : (
+                /* Empty Search Results State */
+                <Center minHeight="50vh">
+                  <Stack align="center" gap="xs">
+                    <SentimentVeryDissatisfied size={48} stroke={1.5} color="var(--mantine-color-dimmed)" />
+                    <Text size="lg" fw={600}>No products found</Text>
+                    <Text size="sm" c="dimmed">Try adjusting your search terms or filters</Text>
+                  </Stack>
+                </Center>
+              )}
+            </Stack>
+          </Grid.Col>
+
+          {/* Right Column: Sticky Cart Sidebar (Authenticated Users Only) */}
+          {localStorage.getItem('email') && (
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <Box
+                bg="#E9F5E1"
+                p="md"
+                style={{
+                  borderRadius: 'var(--mantine-radius-md)',
+                  position: 'sticky',
+                  top: '90px' // Keeps cart fixed in view while browsing products
+                }}
+              >
+                <Cart
+                  products={productData}
+                  items={items}
+                  handleQuantity={addToCart}
                 />
-              </Grid>
-              ))}
-            </Grid>:
-            <Grid container sx={{ display: 'flex',flexDirection:'column', alignItems:'center', justifyContent:'center', height:'50vh'}}>
-              <SentimentDissatisfied/>
-              <Typography>No products found</Typography>
-            </Grid>
-            ):
-            <Box sx={{ display: 'flex',flexDirection:'column', alignItems:'center', justifyContent:'center', height:'50vh'}}>
-            <CircularProgress />
-            <p>Loading Products</p>
-            </Box>
-            }
+              </Box>
+            </Grid.Col>
+          )}
+
         </Grid>
-        {
-          localStorage.getItem('email')?
-          <Grid item xs={12} md={4} bgcolor='#E9F5E1'>
-            <Cart products={productData} items={items} handleQuantity={addToCart}/>
-          </Grid>:null
-        }
-      </Grid>
+      </Container>
+
       <Footer />
-    </div>
+    </Box>
   );
 };
 
