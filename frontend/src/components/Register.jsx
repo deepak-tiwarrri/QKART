@@ -12,7 +12,7 @@ import "./Register.css";
 const Register = () => {
   const history = useHistory();
   const [formData, setFormData] = useState({
-    name:"",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -64,36 +64,45 @@ const Register = () => {
       } else {
         payload.name = formData.name;
       }
-      
-      const response = await axios.post(`${config.endpoint}/auth/register`, payload);
+
+      const response = await axios.post(
+        `${config.endpoint}/auth/register`,
+        payload,
+      );
       console.log("response from the register: ", response);
-      
-      // Backend returns 200 OK with message for duplicates (or other 200-level errors)
-      if (response.data && response.data.message) {
-        setLoading(false);
-        toast.error(response.data.message);
+      const { data, status } = response || {};
+      const message = data?.message || data?.success;
+      console.log(`message: ${message}, status: ${status}, data: ${data}`);
+      if (status === 200 || status === 201) {
+        toast.success("Registered successfully");
+      } else {
+        toast.error(message || "Something went wrong!! Please Try Again");
         return;
       }
-      
-      setLoading(false);
       setFormData({
+        name: "",
         email: "",
         password: "",
         confirmPassword: "",
       });
-      toast.success("Registered Successfully");
       //history
       history.push("/login");
     } catch (e) {
-      console.log('error from register: ', e);
-      setLoading(false);
-      if (e.response && (e.response.status === 400 || e.response.status === 200)) {
-        toast.error(e.response.data.message);
+      console.log("error from register: ", e);
+      if (
+        e?.response &&
+        (e?.response?.status === 400 ||
+          e?.response?.status === 409 ||
+          e?.response?.status === 200)
+      ) {
+        toast.error(e?.response?.data?.message);
       } else {
         toast.error(
-          "Something went wrong. Check that the backend is running, reachable and returns valid JSON."
+          "Something went wrong. Check that the backend is running, reachable and returns valid JSON.",
         );
       }
+    } finally {
+      setLoading(false);
     }
   };
 

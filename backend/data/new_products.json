@@ -10,5 +10,19 @@
   {"name":"Apple iPad Pro with Apple M1 chip","category":"Electronics","cost":900,"rating":5,"image":"https://crio-directus-assets.s3.ap-south-1.amazonaws.com/82ac2e7b-e4dd-4a5b-8dbc-3260225d7eb2.png","_id":"w4sLtEcMpzabRyfx"},
   {"name":"OnePlus (55 inches) Q1 Series 4K","category":"Electronics","cost":1200,"rating":5,"image":"https://crio-directus-assets.s3.ap-south-1.amazonaws.com/a9ca1e8b-8783-4be3-83f8-d06409016e15.png","_id":"x4sLtEcMpzabRyfx"},
   {"name":"Thinking, Fast and Slow","category":"Books","cost":15,"rating":5,"image":"https://crio-directus-assets.s3.ap-south-1.amazonaws.com/cdb64440-5e95-4aaa-858b-8c12ee316d93.png","_id":"y4sLtEcMpzabRyfx"},
-  {"name":"GREY DOUBLE BUTTON BLAZER","category":"Fashion","cost":75,"rating":4,"image":"https://crio-directus-assets.s3.ap-south-1.amazonaws.com/869ec5e2-52d2-4b8e-bc6b-57eace9ab39e.png","_id":"z4sLtEcMpzabRyfx"}
+  {"name":"GREY DOUBLE BUTTON BLAZER","category":"Fashion","cost":75,"rating":4,"image":"https://crio-directus-assets.s3.ap-south-1.amazonaws.com/869ec5e2-52d2-4b8e-bc6b-57eace9ab39e.png","_id":"z4sLtEcMpzabRyfx"},
+  {"name":"Sony WH-1000XM4 Wireless Headphones","category":"Electronics","cost":250,"rating":5,"image":"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=60","_id":"A1sLtEcMpzabRyfx"},
+  {"name":"Adidas Ultraboost Light Running Shoes","category":"Fashion","cost":180,"rating":5,"image":"https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=500&auto=format&fit=crop&q=60","_id":"B1sLtEcMpzabRyfx"},
+  {"name":"Ergonomic Office Chair","category":"Home & Kitchen","cost":220,"rating":4,"image":"https://images.unsplash.com/photo-1505797149-43b0069ec26b?w=500&auto=format&fit=crop&q=60","_id":"C1sLtEcMpzabRyfx"},
+  {"name":"Mechanical Gaming Keyboard RGB","category":"Electronics","cost":120,"rating":5,"image":"https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=60","_id":"D1sLtEcMpzabRyfx"},
+  {"name":"Hydro Flask 32 oz Water Bottle","category":"Sports","cost":45,"rating":5,"image":"https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500&auto=format&fit=crop&q=60","_id":"E1sLtEcMpzabRyfx"},
+  {"name":"Atomic Habits by James Clear","category":"Books","cost":18,"rating":5,"image":"https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=60","_id":"F1sLtEcMpzabRyfx"},
+  {"name":"Fujifilm Instax Mini 12 Instant Camera","category":"Electronics","cost":80,"rating":4,"image":"https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=60","_id":"G1sLtEcMpzabRyfx"},
+  {"name":"Non-Stick Ceramic Cookware Set","category":"Home & Kitchen","cost":150,"rating":4,"image":"https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=500&auto=format&fit=crop&q=60","_id":"H1sLtEcMpzabRyfx"},
+  {"name":"Patagonia Torrentshell Rain Jacket","category":"Fashion","cost":150,"rating":5,"image":"https://images.unsplash.com/photo-1548883354-7622d03aca27?w=500&auto=format&fit=crop&q=60","_id":"J1sLtEcMpzabRyfx"},
+  {"name":"Gourmet French Press Coffee Maker","category":"Home & Kitchen","cost":35,"rating":4,"image":"https://images.unsplash.com/photo-1577968897966-3d4325b36b61?w=500&auto=format&fit=crop&q=60","_id":"L1sLtEcMpzabRyfx"},
+  {"name":"Nike Heritage Backpack","category":"Fashion","cost":40,"rating":4,"image":"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=60","_id":"M1sLtEcMpzabRyfx"},
+  {"name":"Spalding NBA Street Basketball","category":"Sports","cost":30,"rating":4,"image":"https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500&auto=format&fit=crop&q=60","_id":"N1sLtEcMpzabRyfx"},
+  {"name":"The Hobbit by J.R.R. Tolkien","category":"Books","cost":12,"rating":5,"image":"https://images.unsplash.com/photo-1629992101753-56d196c8aabb?w=500&auto=format&fit=crop&q=60","_id":"O1sLtEcMpzabRyfx"},
+  {"name":"Air Purifier with HEPA Filter","category":"Home & Kitchen","cost":110,"rating":5,"image":"https://images.unsplash.com/photo-1585776245991-cf89dd7fc73a?w=500&auto=format&fit=crop&q=60","_id":"P1sLtEcMpzabRyfx"}
 ]

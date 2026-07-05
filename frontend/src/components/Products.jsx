@@ -51,7 +51,7 @@ const Products = () => {
   let timerId;
   //const [fetchedCart,setFetchedCart]= useState([]);
   const [productData, setProductData] = useState([]);
-  const [isLoaded, setLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState([]);
   let token = localStorage.getItem('token');
   // TODO: CRIO_TASK_MODULE_PRODUCTS - Fetch products data and store it
@@ -94,10 +94,10 @@ const Products = () => {
   const performAPICall = async () => {
 
     try {
+      setIsLoading(true);
       let res = await axios.get(`${config.endpoint}/products`);
       console.log("response from /products", res);
       setProductData(res.data);
-      setLoaded(true);
       if (token !== null) {
         let getData = await fetchCart(token);
         console.log("response from /cart", getData);
@@ -109,9 +109,12 @@ const Products = () => {
       }
     }
     catch (err) {
+      console.log("err from performApiCall to get /products", err);
       toast.error(
         "Something went wrong. Check the backend console for more details"
       );
+    } finally {
+      setIsLoading(false);
     }
   };
   // TODO: CRIO_TASK_MODULE_PRODUCTS - Implement search logic
@@ -137,7 +140,7 @@ const Products = () => {
     catch (err) {
       // console.log(err.toString())
       setProductData([])
-    }
+    } 
   };
 
   // TODO: CRIO_TASK_MODULE_PRODUCTS - Optimise API calls with debounce search implementation
@@ -197,6 +200,14 @@ const Products = () => {
     } catch (e) {
       if (e.response && e.response.status === 404) {
         return [];
+      }
+      if (e.response && e.response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('email');
+        localStorage.removeItem('balance');
+        toast.error("Session expired or invalid. Please login again.");
+        window.location.reload();
+        return null;
       }
       if (e.response && e.response.status === 400) {
         toast.error(e.response.data.message);
@@ -335,7 +346,7 @@ const Products = () => {
               </Box>
 
               {/* Content States: Loading vs. Results vs. Empty */}
-              {!isLoaded ? (
+              {isLoading ? (
                 /* Loading State */
                 <Center minHeight="50vh">
                   <Stack align="center" gap="sm">

@@ -154,6 +154,11 @@ const Login = () => {
             onChange={handleInput}
             fullWidth
             placeholder="Enter a password"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                login(formData);
+              }
+            }}
           />
           {loading ? (
             <Box display="flex" justifyContent="center" alignItems="center">
