@@ -1,36 +1,110 @@
-p {
-    margin-block-start: 0;
-    margin-block-end: 0;
-    margin-bottom: 1rem;
-}
+/* ─────────────────────────────────────────────
+   THANKS PAGE — Order Success
+───────────────────────────────────────────── */
 
 .greeting-container {
-    min-height: 60vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 1rem;
-    background-color: #DCFFE4;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 162, 120, 0.08) 0%,
+    transparent 60%
+  ),
+  var(--color-bg);
 }
 
-#balance-overline {
-    font-weight: 700;
-    margin: 1rem 0 0.5rem 0;
+/* ─── Success Card ────────────────────────── */
+.thanks-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  max-width: 480px;
+  width: 100%;
+  background: var(--color-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    var(--shadow-card),
+    0 0 40px rgba(0, 162, 120, 0.08);
 }
 
-#balance {
-    font-weight: 700;
-    font-size: 1.25rem;
+[data-mantine-color-scheme="dark"] .thanks-card {
+  background: rgba(17, 24, 39, 0.75);
 }
 
-#continue-btn {
-    font-weight: 700;
-    text-transform: none;
+/* ─── Emoji ───────────────────────────────── */
+.thanks-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+/* ─── Title & Subtitle ──────────────────── */
+.thanks-title {
+  color: var(--color-text) !important;
+  font-size: 1.8rem !important;
+  letter-spacing: -0.03em;
+}
+
+.thanks-subtitle {
+  color: var(--color-text-muted) !important;
+  line-height: 1.5;
+}
+
+/* ─── Wallet Info ─────────────────────────── */
+.wallet-info {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 162, 120, 0.1);
+  border: 1px solid rgba(0, 162, 120, 0.2);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.wallet-overline {
+  color: var(--color-teal-500) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem !important;
+}
+
+.wallet-balance-value {
+  color: var(--color-text) !important;
+  font-size: 1.4rem !important;
+  margin-top: 0.25rem;
+}
+
+/* ─── Continue Button ─────────────────────── */
+#continue-btn,
+.thanks-continue-btn {
+  font-weight: 700 !important;
+  text-transform: none !important;
+  border-radius: var(--radius-md) !important;
+  background: linear-gradient(135deg, #00a278, #00ba8a) !important;
+  box-shadow: 0 4px 16px rgba(0, 162, 120, 0.35) !important;
+  padding: 0.6rem 2rem !important;
+  font-size: 1rem !important;
+  margin-top: 0.5rem;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast) !important;
+}
+
+#continue-btn:hover,
+.thanks-continue-btn:hover {
+  box-shadow: 0 8px 24px rgba(0, 162, 120, 0.5) !important;
+  transform: translateY(-2px);
 }
 
 @media screen and (min-width: 768px) {
-    .greeting-container {
-        padding: 4rem;
-    }
+  .thanks-card {
+    padding: 3.5rem 3rem;
+  }
 }

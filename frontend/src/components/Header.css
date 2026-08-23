@@ -1,27 +1,131 @@
+/* ─────────────────────────────────────────────
+   HEADER — Dark Frosted Glass
+───────────────────────────────────────────── */
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    height: 5vh;
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
-    background: #ffffff;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  transition:
+    box-shadow var(--transition-base),
+    border-color var(--transition-base),
+    background var(--transition-base);
 }
 
-.username-text {
-    display: none;
+/* Scroll-aware depth shadow */
+.header--scrolled {
+  box-shadow:
+    0 2px 24px rgba(0, 0, 0, 0.15),
+    0 1px 6px rgba(0, 162, 120, 0.08);
+  border-bottom-color: rgba(0, 162, 120, 0.15);
+}
+
+[data-mantine-color-scheme="dark"] .header {
+  background: rgba(10, 15, 26, 0.8);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-mantine-color-scheme="dark"] .header--scrolled {
+  box-shadow:
+    0 2px 32px rgba(0, 0, 0, 0.6),
+    0 1px 8px rgba(0, 162, 120, 0.12);
+  border-bottom-color: rgba(0, 162, 120, 0.2);
+}
+
+/* ─────────────────────────────────────────────
+   HEADER INNER LAYOUT
+───────────────────────────────────────────── */
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mantine-spacing-md);
+  min-height: 72px;
+  padding-block: 0.75rem;
 }
 
 .header-title {
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
-.explore-button {
-    color: #00a278 !important;
+.header-logo {
+  display: block;
+  height: 36px;
+  width: auto;
+  /* Base filter: invert logo for dark mode, keep original for light */
+  filter: none;
+  transition: filter var(--transition-base);
+}
+
+[data-mantine-color-scheme="dark"] .header-logo {
+  filter: brightness(0) invert(1);
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.header-actions {
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* ─────────────────────────────────────────────
+   THEME TOGGLE
+───────────────────────────────────────────── */
+.theme-toggle {
+  transition: transform var(--transition-spring);
+}
+
+.theme-toggle:hover {
+  transform: rotate(20deg);
+}
+
+/* ─────────────────────────────────────────────
+   CART BADGE
+───────────────────────────────────────────── */
+.cart-badge {
+  cursor: pointer;
+  font-weight: 700 !important;
+}
+
+/* ─────────────────────────────────────────────
+   USERNAME TEXT
+───────────────────────────────────────────── */
+.username-text {
+  display: none;
+  color: var(--color-text-muted);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media screen and (min-width: 768px) {
-    .username-text {
-        display: block;
-    }
+  .username-text {
+    display: block;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   EXPLORE BUTTON (back-to-explore)
+───────────────────────────────────────────── */
+.explore-button {
+  font-weight: 600;
+  transition: transform var(--transition-fast);
+}
+
+.explore-button:hover {
+  transform: translateX(-2px);
 }

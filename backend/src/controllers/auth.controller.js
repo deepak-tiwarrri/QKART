@@ -57,8 +57,8 @@ const register = catchAsync(async (req, res) => {
       if (existingUser) {
         // If email is already used, return a 409 status response (Conflict)
         return res
-          .status(httpStatus.OK)
-          .json({ code: httpStatus.OK, message: "Email is already in use" });
+          .status(httpStatus.CONFLICT)
+          .json({ code: httpStatus.CONFLICT, message: "Email is already in use" });
       }
       const user = await userService.createUser(req.body);
       const tokens = await tokenService.generateAuthTokens(user);

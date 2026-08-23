@@ -1,89 +1,69 @@
 var express = require("express");
 var router = express.Router();
-const { handleError } = require("../utils");
+const { handleError, sendResponse, sha256 } = require("../utils");
 var { users } = require("../db");
-const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const config = require("../config.json");
 
 router.post("/register", (req, res) => {
-  console.log(`GET request to "/auth/register" received for user}`);
+  console.log(`POST request to "/auth/register" received`);
 
-  users.findOne({ username: req.body.username }, (err, user) => {
+  users.findOne({ username: req.body.email }, (err, user) => {
     if (err) {
       return handleError(res, err);
     }
     if (user) {
-      return res.status(400).json({
-        success: false,
-        message: "Username already exists",
-      });
+      return sendResponse(res, 400, false, "Email already registered", null);
     }
-    // if (req.body.username.length < 6 || req.body.username.length > 32) {
-    //     return res.status(400).json({
-    //         success: false,
-    //         message:
-    //             'Username must be between 6 and 32 characters in length'
-    //     });
-    // }
-    // if (req.body.password.length < 6 || req.body.password.length > 32) {
-    //     return res.status(400).json({
-    //         success: false,
-    //         message:
-    //             'Password must be between 6 and 32 characters in length'
-    //     });
-    // }
+
     users.insert({
-      username: req.body.username,
+      username: req.body.email,
+      name: req.body.name || req.body.email,
       password: sha256(req.body.password),
       balance: 5000,
       cart: [],
       addresses: [],
     });
 
-    console.log(`Registered user: ${req.body.username}`);
+    console.log(`Registered user: ${req.body.email}`);
 
-    return res.status(201).json({
-      success: true,
-    });
+    return sendResponse(res, 201, true, "Registration successful", null);
   });
 });
 
 router.post("/login", (req, res) => {
   console.log(`POST request to "/auth/login" received`);
 
-  users.findOne({ username: req.body.username }, (err, user) => {
+  users.findOne({ username: req.body.email }, (err, user) => {
     if (err) {
       return handleError(res, err);
     }
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "Username does not exist",
-      });
+      return sendResponse(res, 400, false, "Email does not exist", null);
     }
     if (user.password !== sha256(req.body.password)) {
-      return res.status(400).json({
-        success: false,
-        message: "Password is incorrect",
-      });
+      return sendResponse(res, 400, false, "Password is incorrect", null);
     }
+
     const token = jwt.sign({ username: user.username }, config.jwtSecret, {
       expiresIn: "6h",
     });
 
-    console.log(`Logged in as user: ${req.body.username}`);
+    console.log(`Logged in as user: ${user.username}`);
 
-    return res.status(201).json({
-      success: true,
-      token: token,
-      username: user.username,
-      balance: user.balance,
+    return sendResponse(res, 200, true, "Login successful", {
+      user: {
+        email: user.username,
+        walletMoney: user.balance,
+        name: user.name || user.username,
+      },
+      tokens: {
+        access: {
+          token,
+        },
+      },
     });
   });
 });
-
-const sha256 = (input) =>
-  crypto.createHash("sha256").update(input, "utf8").digest("hex");
 
 module.exports = router;

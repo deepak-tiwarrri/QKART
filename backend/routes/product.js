@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { handleError, getProduct } = require("../utils");
+const { handleError, getProduct, sendResponse } = require("../utils");
 var { products } = require("../db");
 
 router.get("/", (req, res) => {
@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
     if (err) {
       return handleError(res, err);
     }
-    return res.status(200).json(docs);
+    return sendResponse(res, 200, true, "Products fetched successfully", docs);
   });
 });
 
@@ -29,9 +29,9 @@ router.get("/search", (req, res) => {
       }
 
       if (docs.length) {
-        return res.status(200).json(docs);
+        return sendResponse(res, 200, true, "Search results", docs);
       } else {
-        return res.status(404).json([]);
+        return sendResponse(res, 404, false, "No products found", []);
       }
     }
   );
@@ -44,9 +44,9 @@ router.get("/:id", async (req, res) => {
   try {
     const product = await getProduct(req.params.id);
     if (product) {
-      return res.status(200).json(product);
+      return sendResponse(res, 200, true, "Product fetched successfully", product);
     } else {
-      return res.status(404).json();
+      return sendResponse(res, 404, false, "Product not found", null);
     }
   } catch (error) {
     handleError(res, error);

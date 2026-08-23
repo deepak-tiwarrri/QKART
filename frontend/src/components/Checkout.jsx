@@ -1,132 +1,25 @@
-import { CreditCard, Delete } from "@mui/icons-material";
-import {
-  Button,
-  Divider,
-  Grid,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { CreditCard, AddLocation } from "@mui/icons-material";
+import { Button, Divider, Grid } from "@mui/material";
 import { Box } from "@mui/system";
-import axios from "axios";
-import { toast } from "react-toastify";
-import React, { useEffect, useState } from "react";
+import { Text } from "@mantine/core";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { config } from "../App";
 import Cart, { getTotalCartValue, generateCartItemsFrom } from "./Cart";
 import "./Checkout.css";
 import Footer from "./Footer";
 import Header from "./Header";
+import AddressCard from "./AddressCard";
+import AddNewAddressView from "./AddNewAddressView";
+import useAuthStore from "../stores/authStore";
+import { fetchCart, checkoutCart } from "../services/cartService";
+import { getAddresses, addAddress, deleteAddress } from "../services/userService";
+import apiClient from "../lib/apiClient";
 
-
-// Definition of Data Structures used
-/**
- * @typedef {Object} Product - Data on product available to buy
- *
- * @property {string} name - The name or title of the product
- * @property {string} category - The category that the product belongs to
- * @property {number} cost - The price to buy the product
- * @property {number} rating - The aggregate rating of the product (integer out of five)
- * @property {string} image - Contains URL for the product image
- * @property {string} _id - Unique ID for the product
- */
-
-/**
- * @typedef {Object} CartItem -  - Data on product added to cart
- *
- * @property {string} name - The name or title of the product in cart
- * @property {string} qty - The quantity of product added to cart
- * @property {string} category - The category that the product belongs to
- * @property {number} cost - The price to buy the product
- * @property {number} rating - The aggregate rating of the product (integer out of five)
- * @property {string} image - Contains URL for the product image
- * @property {string} productId - Unique ID for the product
- */
-
-/**
- * @typedef {Object} Address - Data on added address
- *
- * @property {string} _id - Unique ID for the address
- * @property {string} address - Full address string
- */
-
-/**
- * @typedef {Object} Addresses - Data on all added addresses
- *
- * @property {Array.<Address>} all - Data on all added addresses
- * @property {string} selected - Id of the currently selected address
- */
-
-/**
- * @typedef {Object} NewAddress - Data on the new address being typed
- *
- * @property { Boolean } isAddingNewAddress - If a new address is being added
- * @property { String} value - Latest value of the address being typed
- */
-
-// TODO: CRIO_TASK_MODULE_CHECKOUT - Should allow to type a new address in the text field and add the new address or cancel adding new address
-/**
- * Returns the complete data on all products in cartData by searching in productsData
- *
- * @param { String } token
- *    Login token
- *
- * @param { NewAddress } newAddress
- *    Data on new address being added
- *
- * @param { Function } handleNewAddress
- *    Handler function to set the new address field to the latest typed value
- *
- * @param { Function } addAddress
- *    Handler function to make an API call to add the new address
- *
- * @returns { JSX.Element }
- *    JSX for the Add new address view
- *
- */
-
-
-const AddNewAddressView = ({
-  token,
-  newAddress,
-  handleNewAddress,
-  addAddress,
-}) => {
-  let handleChange=(e)=>{
-    handleNewAddress({
-      ...newAddress,
-      isAddingNewAddress: true,
-      value: e.target.value, 
-    })
-  }
-  return (
-    <Box display="flex" flexDirection="column">
-      <TextField
-        multiline
-        minRows={4}
-        placeholder="Enter your complete address"
-        onChange={handleChange}
-      />
-      <Stack direction="row" my="1rem">
-        <Button
-          variant="contained"
-          onClick={()=>addAddress(token,newAddress)}
-        >
-          Add
-        </Button>
-        <Button
-          variant="text"
-          onClick={()=>handleNewAddress({...newAddress, isAddingNewAddress:false})}
-        >
-          Cancel
-        </Button>
-      </Stack>
-    </Box>
-  );
-};
-
+// ─── Checkout component ───────────────────────────────────────────────────
 const Checkout = () => {
-  const token = localStorage.getItem("token");
+  const { token, updateBalance } = useAuthStore();
   const history = useHistory();
   const [items, setItems] = useState([]);
   const [products, setProducts] = useState([]);
@@ -136,433 +29,218 @@ const Checkout = () => {
     value: "",
   });
 
-  
-  if(token===null) {
-    toast.warn('You must be logged in to access checkout page')
-    history.push('/login');
-  }
+  // Guard — redirect if not logged in
+  useEffect(() => {
+    if (!token) {
+      toast.warning("You must be logged in to access checkout");
+      history.push("/login");
+    }
+  }, [token, history]);
 
-  // Fetch the entire products list
+  // Fetch products
   const getProducts = async () => {
     try {
-      const response = await axios.get(`${config.endpoint}/products`);
-      setProducts(response.data);
-      return response.data;
-    } catch (e) {
-      if (e.response && e.response.status === 500) {
-        toast.error(e.response.data.message);
-        return null;
-      } else {
-        toast.error(
-          "Could not fetch products. Check that the backend is running, reachable and returns valid JSON."
-        );
-      }
-    }
-  };
-
-  // Fetch cart data
-  const fetchCart = async (token) => {
-    if (!token) return;
-    try {
-      const response = await axios.get(`${config.endpoint}/cart`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      return response.data;
-    } catch (e) {
-      if (e.response && e.response.status === 404) {
-        return [];
-      }
-      toast.error(
-        "Could not fetch cart details. Check that the backend is running, reachable and returns valid JSON."
-      );
-      return null;
-    }
-  };
-
-  /**
-   * Fetch list of addresses for a user
-   *
-   * API Endpoint - "GET /user/addresses"
-   *
-   * Example for successful response from backend:
-   * HTTP 200
-   * [
-   *      {
-   *          "_id": "",
-   *          "address": "Test address\n12th street, Mumbai"
-   *      },
-   *      {
-   *          "_id": "BW0jAAeDJmlZCF8i",
-   *          "address": "New address \nKolam lane, Chennai"
-   *      }
-   * ]
-   *
-   * Example for failed response from backend:
-   * HTTP 401
-   * {
-   *      "success": false,
-   *      "message": "Protected route, Oauth2 Bearer token not found"
-   * }
-   */
-  const getAddresses = async (token) => {
-    if (!token) return;
-    try {
-      const response = await axios.get(`${config.endpoint}/user/addresses`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setAddresses({ all: response.data, selected: response.data[0]?._id || "" });
-      //console.log(response.data);
-      return response.data;
+      const response = await apiClient.get("/products");
+      console.log(`response from getProducts checkout: `, response);
+      const data = response ?? [];
+      setProducts(data);
+      return data;
     } catch {
-      toast.error(
-        "Could not fetch addresses. Check that the backend is running, reachable and returns valid JSON."
-      );
+      toast.error("Could not fetch products. Check that the backend is running.");
       return null;
     }
   };
 
-  /**
-   * Handler function to add a new address and display the latest list of addresses
-   *
-   * @param { String } token
-   *    Login token
-   *
-   * @param { NewAddress } newAddress
-   *    Data on new address being added
-   *
-   * @returns { Array.<Address> }
-   *    Latest list of addresses
-   *
-   * API Endpoint - "POST /user/addresses"
-   *
-   * Example for successful response from backend:
-   * HTTP 200
-   * [
-   *      {
-   *          "_id": "",
-   *          "address": "Test address\n12th street, Mumbai"
-   *      },
-   *      {
-   *          "_id": "BW0jAAeDJmlZCF8i",
-   *          "address": "New address \nKolam lane, Chennai"
-   *      }
-   * ]
-   *
-   * Example for failed response from backend:
-   * HTTP 401
-   * {
-   *      "success": false,
-   *      "message": "Protected route, Oauth2 Bearer token not found"
-   * }
-   */
-  const addAddress = async (token, newAddress) => {
-    try {
-      let addedAddress=await axios.post(`${config.endpoint}/user/addresses`,{"address":newAddress.value},{headers:{'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'}})
-      setNewAddress({ ...newAddress, isAddingNewAddress: false })
-      setAddresses({ all: addedAddress.data, selected: addedAddress.data[0]?._id || "" })
-      return await addedAddress.data;
-    } catch (e) {
-      if (e.response) {
-        toast.error(e.response.data.message);
-      } else {
-        toast.error(
-          "Could not add this address. Check that the backend is running, reachable and returns valid JSON."
-        );
-      }
-    }
-  };
-
-  /**
-   * Handler function to delete an address from the backend and display the latest list of addresses
-   *
-   * @param { String } token
-   *    Login token
-   *
-   * @param { String } addressId
-   *    Id value of the address to be deleted
-   *
-   * @returns { Array.<Address> }
-   *    Latest list of addresses
-   *
-   * API Endpoint - "DELETE /user/addresses/:addressId"
-   *
-   * Example for successful response from backend:
-   * HTTP 200
-   * [
-   *      {
-   *          "_id": "",
-   *          "address": "Test address\n12th street, Mumbai"
-   *      },
-   *      {
-   *          "_id": "BW0jAAeDJmlZCF8i",
-   *          "address": "New address \nKolam lane, Chennai"
-   *      }
-   * ]
-   *
-   * Example for failed response from backend:
-   * HTTP 401
-   * {
-   *      "success": false,
-   *      "message": "Protected route, Oauth2 Bearer token not found"
-   * }
-   */
-  const deleteAddress = async (token, addressId) => {
-    try {
-      // TODO: CRIO_TASK_MODULE_CHECKOUT - Delete selected address from the backend and display the latest list of addresses
-      const url = `${config.endpoint}/user/addresses/${addressId}`;
-      const response = await axios.delete(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setAddresses({ all: response.data, selected: "" });
-      return response.data;
-    } catch (e) {
-      if (e.response) {
-        toast.error(e.response.data.message);
-      } else {
-        toast.error(
-          "Could not delete this address. Check that the backend is running, reachable and returns valid JSON."
-        );
-      }
-    }
-  };
-
-  // TODO: CRIO_TASK_MODULE_CHECKOUT - Validate request for checkout
-  /**
-   * Return if the request validation passed. If it fails, display appropriate warning message.
-   *
-   * Validation checks - show warning message with given text if any of these validation fails
-   *
-   *  1. Not enough balance available to checkout cart items
-   *    "You do not have enough balance in your wallet for this purchase"
-   *
-   *  2. No addresses added for user
-   *    "Please add a new address before proceeding."
-   *
-   *  3. No address selected for checkout
-   *    "Please select one shipping address to proceed."
-   *
-   * @param { Array.<CartItem> } items
-   *    Array of objects with complete data on products added to the cart
-   *
-   * @param { Addresses } addresses
-   *    Contains data on array of addresses and selected address id
-   *
-   * @returns { Boolean }
-   *    Whether validation passed or not
-   *
-   * */
-   const validateRequest = (items, addresses) => {
-    if (localStorage.getItem("balance") < getTotalCartValue(items)) {
-      toast.error(
-        "You do not have enough balance in your wallet for this purchase"
-      );
-      return false;
-    } else if (addresses.all.length === 0) {
-      toast.error("Please add a new address before proceeding.");
-      return false;
-    } else if (addresses.selected === "") {
-      toast.error("Please select one shipping address to proceed.");
-      return false;
-    }
-
-    return true;
-  };
-
-  // TODO: CRIO_TASK_MODULE_CHECKOUT
-  /**
-   * Handler function to perform checkout operation for items added to the cart for the selected address
-   *
-   * @param { String } token
-   *    Login token
-   *
-   * @param { Array.<CartItem } items
-   *    Array of objects with complete data on products added to the cart
-   *
-   * @param { Addresses } addresses
-   *    Contains data on array of addresses and selected address id
-   *
-   * @returns { Boolean }
-   *    If checkout operation was successful
-   *
-   * API endpoint - "POST /cart/checkout"
-   *
-   * Example for successful response from backend:
-   * HTTP 200
-   * {
-   *  "success": true
-   * }
-   *
-   * Example for failed response from backend:
-   * HTTP 400
-   * {
-   *  "success": false,
-   *  "message": "Wallet balance not sufficient to place order"
-   * }
-   *
-   */
-   const performCheckout = async (token, items, addresses) => {
-    if (validateRequest(items, addresses)) {
-      try {
-        // eslint-disable-next-line
-        const response = await axios.post(
-          `${config.endpoint}/cart/checkout`,
-          { addressId: addresses.selected },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        //   if (response.data) {
-        localStorage.setItem(
-          "balance",
-          localStorage.getItem("balance") - getTotalCartValue(items)
-        );
-        toast.success("Order placed successfully");
-        history.push("/thanks");
-        // }
-      } catch (error) {
-        if (error.response) {
-          toast.error(error.response.data.message);
-        } else {
-          toast.error(
-            "Could not delete this address. Check that the backend is running, reachable and returns valid JSON."
-          );
-        }
-      }
-    }
-  };
-
-  // TODO: CRIO_TASK_MODULE_CHECKOUT - Fetch addressses if logged in, otherwise show info message and redirect to Products page
-
-
-  // Fetch products and cart data on page load
+  // On mount — load products, cart, addresses
   useEffect(() => {
     const onLoadHandler = async () => {
       const productsData = await getProducts();
 
-      const cartData = await fetchCart(token);
-
-      if (productsData && cartData) {
-        const cartDetails = await generateCartItemsFrom(cartData, productsData);
-        setItems(cartDetails);
+      try {
+        const cartData = await fetchCart();
+        console.log("fetch cartData: ",cartData);
+        if (productsData && cartData) {
+          const cartDetails = generateCartItemsFrom(cartData, productsData);
+          setItems(cartDetails);
+        }
+      } catch {
+        toast.error("Could not fetch cart.");
       }
-      getAddresses(token);
+
+      try {
+        const addressData = await getAddresses();
+        setAddresses({ all: addressData, selected: addressData[0]?._id || "" });
+      } catch {
+        toast.error("Could not fetch addresses.");
+      }
     };
     onLoadHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  console.log(addresses);
+
+  const handleAddAddress = async () => {
+    try {
+      const updatedAddresses = await addAddress(newAddress.value);
+      setAddresses({ all: updatedAddresses, selected: updatedAddresses[0]?._id || "" });
+      setNewAddress({ isAddingNewAddress: false, value: "" });
+      toast.success("Address added successfully!");
+    } catch (err) {
+      toast.error(err.message || "Could not add address.");
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    try {
+      const updatedAddresses = await deleteAddress(addressId);
+      setAddresses({ all: updatedAddresses, selected: "" });
+      toast.success("Address deleted.");
+    } catch (err) {
+      toast.error(err.message || "Could not delete address.");
+    }
+  };
+
+  const validateRequest = (items, addresses) => {
+    if (localStorage.getItem("balance") < getTotalCartValue(items)) {
+      toast.error("You do not have enough balance in your wallet for this purchase");
+      return false;
+    }
+    if (addresses.all.length === 0) {
+      toast.error("Please add a new address before proceeding.");
+      return false;
+    }
+    if (addresses.selected === "") {
+      toast.error("Please select one shipping address to proceed.");
+      return false;
+    }
+    return true;
+  };
+
+  const performCheckout = async () => {
+    if (!validateRequest(items, addresses)) return;
+    try {
+      await checkoutCart(addresses.selected);
+      const newBal = Number(localStorage.getItem("balance")) - getTotalCartValue(items);
+      updateBalance(newBal);
+      toast.success("Order placed successfully! 🎉");
+      history.push("/thanks");
+    } catch (error) {
+      toast.error(error.message || "Checkout failed. Please try again.");
+    }
+  };
+
   return (
     <>
       <Header />
       <Grid container>
+        {/* Left: Shipping & Payment */}
         <Grid item xs={12} md={9}>
           <Box className="shipping-container" minHeight="100vh">
-            <Typography color="#3C3C3C" variant="h4" my="1rem">
-              Shipping
-            </Typography>
-            <Typography color="#3C3C3C" my="1rem">
-              Manage all the shipping addresses you want. This way you won't
-              have to enter the shipping address manually with every order.
-              Select the address you want to get your order delivered.
-            </Typography>
-            <Divider />
-            <Box>
-              {/* TODO: CRIO_TASK_MODULE_CHECKOUT - Display list of addresses and corresponding "Delete" buttons, if present, of which 1 can be selected */}
+
+            {/* Shipping Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Text className="section-title">Shipping</Text>
+              <Text className="section-subtitle">
+                Manage all the shipping addresses you want. Select the address you want to get your order delivered.
+              </Text>
+              <Divider className="section-divider" />
+            </motion.div>
+
+            {/* Addresses */}
+            <Box mt="1rem">
               {addresses.all.length === 0 ? (
-                <Typography my="1rem">
-                  No addresses found for this account. Please add one to proceed
-                </Typography>
+                <Text className="no-address-text">
+                  No addresses found for this account. Please add one to proceed.
+                </Text>
               ) : (
-                addresses.all.map((data) => (
-                  <Box
-                    className={
-                      addresses.selected === data._id
-                        ? "address-item selected"
-                        : "address-item not-selected"
-                    }
-                    key={data._id}
-                    onClick={() => {
-                      setAddresses((currAddress) => ({
-                        ...currAddress,
-                        selected: data._id,
-                      }));
-                    }}
-                  >
-                    <Typography variant="p">{data.address}</Typography>
-                    <Button
-                      variant="text"
-                      startIcon={<Delete />}
-                      onClick={async () => await deleteAddress(token, data._id)}
-                    >
-                      DELETE
-                    </Button>
-                  </Box>
-                ))
+                <AnimatePresence mode="popLayout">
+                  {addresses.all.map((data) => (
+                    <AddressCard
+                      key={data._id}
+                      data={data}
+                      isSelected={addresses.selected === data._id}
+                      onSelect={() => setAddresses((curr) => ({ ...curr, selected: data._id }))}
+                      onDelete={() => handleDeleteAddress(data._id)}
+                    />
+                  ))}
+                </AnimatePresence>
               )}
             </Box>
 
-            {/* TODO: CRIO_TASK_MODULE_CHECKOUT - Dislay either "Add new address" button or the <AddNewAddressView> component to edit the currently selected address */}
-            {!newAddress.isAddingNewAddress?<Button
-                color="primary"
-                variant="contained"
-                id="add-new-btn"
-                size="large"
-                onClick={() => {
-                  setNewAddress((currNewAddress) => ({
-                    ...currNewAddress,
-                    isAddingNewAddress: true,
-                  }));
-                }}
-              >
-                Add new address
-            </Button>:
-            <AddNewAddressView
-            token={token}
-            newAddress={newAddress}
-            handleNewAddress={setNewAddress}
-            addAddress={addAddress}
-              />
-            }
+            {/* Add new address toggle */}
+            <AnimatePresence mode="wait">
+              {!newAddress.isAddingNewAddress ? (
+                <motion.div
+                  key="add-btn"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    id="add-new-btn"
+                    size="large"
+                    startIcon={<AddLocation />}
+                    className="add-address-btn"
+                    onClick={() =>
+                      setNewAddress((curr) => ({ ...curr, isAddingNewAddress: true }))
+                    }
+                  >
+                    Add new address
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div key="add-form">
+                  <AddNewAddressView
+                    newAddress={newAddress}
+                    handleNewAddress={setNewAddress}
+                    onAdd={handleAddAddress}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-
-            <Typography color="#3C3C3C" variant="h4" my="1rem">
-              Payment
-            </Typography>
-            <Typography color="#3C3C3C" my="1rem">
-              Payment Method
-            </Typography>
-            <Divider />
-
-            <Box my="1rem">
-              <Typography>Wallet</Typography>
-              <Typography>
-                Pay ${getTotalCartValue(items)} of available $
-                {localStorage.getItem("balance")}
-              </Typography>
-            </Box>
-
-            <Button
-              startIcon={<CreditCard />}
-              variant="contained"
-              onClick={() => performCheckout(token, items, addresses)}
+            {/* Payment Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
             >
-              PLACE ORDER
-            </Button>
+              <Text className="section-title" mt="2rem">Payment</Text>
+              <Text className="section-subtitle">Payment Method</Text>
+              <Divider className="section-divider" />
+
+              <Box className="wallet-section">
+                <Box className="wallet-icon-wrap">💳</Box>
+                <Box>
+                  <Text fw={600} size="sm" className="wallet-label">Wallet Balance</Text>
+                  <Text size="sm" className="wallet-amount">
+                    Pay <strong>${getTotalCartValue(items)}</strong> from available{" "}
+                    <strong className="wallet-balance">${localStorage.getItem("balance")}</strong>
+                  </Text>
+                </Box>
+              </Box>
+
+              <Button
+                startIcon={<CreditCard />}
+                variant="contained"
+                color="primary"
+                className="place-order-btn"
+                onClick={performCheckout}
+                size="large"
+              >
+                Place Order
+              </Button>
+            </motion.div>
           </Box>
         </Grid>
-        <Grid item xs={12} md={3} bgcolor="#E9F5E1">
+
+        {/* Right: Cart summary */}
+        <Grid item xs={12} md={3} className="checkout-cart-col">
           <Cart isReadOnly={true} products={products} items={items} />
         </Grid>
       </Grid>
