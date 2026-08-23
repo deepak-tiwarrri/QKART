@@ -9,7 +9,10 @@ import Thanks from "./components/Thanks";
 import ipConfig from "./ipConfig.json";
 
 export const config = {
-  endpoint: `http://${ipConfig.workspaceIp}:8082/api/v1`,
+  endpoint:
+    (typeof import.meta !== "undefined" &&
+      (import.meta.env?.VITE_BACKEND_URL || import.meta.env?.VITE_API_URL)) ||
+    `http://${ipConfig.workspaceIp}:8082/api/v1`,
 };
 
 function App() {
