@@ -1,29 +1,83 @@
-.card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+/* ─────────────────────────────────────────────
+   PRODUCT CARD — Dark Glass with Hover Lift
+───────────────────────────────────────────── */
+
+.product-card {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-card) !important;
+  transition:
+    box-shadow var(--transition-base),
+    border-color var(--transition-base) !important;
+  cursor: pointer;
+  will-change: transform;
+  overflow: hidden;
 }
 
-.card-actions {
-    margin-bottom: 1rem;
+/* Shadow intensifies on hover — Framer Motion handles transform */
+.product-card:hover {
+  box-shadow: var(--shadow-card-hover) !important;
+  border-color: rgba(0, 162, 120, 0.25) !important;
 }
 
-.card-button {
-    text-transform: none;
-    font-weight: 600;
-    background-color: #00a278;
-    color: #ffffff;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
+/* Dark mode card */
+[data-mantine-color-scheme="dark"] .product-card {
+  background: rgba(17, 24, 39, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-.card-button:hover {
-    background-color: #00845c;
+[data-mantine-color-scheme="dark"] .product-card:hover {
+  border-color: rgba(0, 162, 120, 0.35) !important;
 }
 
-.card-button:disabled {
-    background-color: #00845c;
-    cursor: not-allowed;
+/* ─── Image Section ──────────────────────── */
+.product-card-image-section {
+  overflow: hidden;
+}
+
+.product-card-image {
+  transition: transform var(--transition-slow) !important;
+}
+
+.product-card:hover .product-card-image {
+  transform: scale(1.06);
+}
+
+/* ─── Card Header (name + price) ─────────── */
+.product-card-header {
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+}
+
+.product-card-name {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--color-text) !important;
+}
+
+.product-card-price {
+  font-size: 1rem;
+  color: var(--color-teal-500) !important;
+  white-space: nowrap;
+}
+
+/* ─── Add to Cart Button ─────────────────── */
+.product-card-btn {
+  background: linear-gradient(135deg, #00a278, #00ba8a) !important;
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.04em;
+  transition:
+    box-shadow var(--transition-fast),
+    filter var(--transition-fast) !important;
+}
+
+.product-card-btn:hover {
+  box-shadow: 0 4px 16px rgba(0, 162, 120, 0.45) !important;
+  filter: brightness(1.08);
 }

@@ -5,8 +5,11 @@ import Products from "./components/Products";
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
 import Thanks from "./components/Thanks";
+
+import ipConfig from "./ipConfig.json";
+
 export const config = {
-  endpoint: `http://localhost:8082/v1`,
+  endpoint: `http://${ipConfig.workspaceIp}:8082/api/v1`,
 };
 
 function App() {

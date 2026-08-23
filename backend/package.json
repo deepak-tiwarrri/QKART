@@ -1,5 +1,5 @@
 {
-  "name": "qkart_me_backend",
+  "name": "qkart-backend",
   "version": "1.4.1",
   "main": "src/index.js",
   "engines": {

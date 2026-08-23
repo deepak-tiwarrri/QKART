@@ -1,60 +1,209 @@
-.content {
-    background-image: url("../assets/hero_image.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    display: flex;
-    justify-content: center;
-    height: 70vh;
+/* ─────────────────────────────────────────────
+   AUTH PAGE — Shared styles for Login & Register
+   Glassmorphism card on animated dark background
+───────────────────────────────────────────── */
+
+/* Full page layout */
+.auth-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.form {
-    background-color: white;
-    border-radius: 10px;
-    padding: 2rem;
-    min-width: 80%;
-    margin: 2rem;
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+/* ─── Animated Background ──────────────────── */
+.auth-bg {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 20% 50%,
+    rgba(0, 162, 120, 0.12) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    ellipse at 80% 20%,
+    rgba(0, 130, 96, 0.1) 0%,
+    transparent 50%
+  ),
+  linear-gradient(135deg, #0a0f1a 0%, #0d1b2a 40%, #0a1628 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
 }
 
-.title {
-    color: #00a278;
+/* Floating background blobs */
+.auth-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  animation: blobFloat 8s ease-in-out infinite;
 }
 
-.secondary-action {
-    padding: 1rem 0;
+.auth-blob-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0, 162, 120, 0.18) 0%, transparent 70%);
+  top: -10%;
+  left: -5%;
+  animation-delay: 0s;
 }
 
-.link {
-    font-weight: 700;
-    text-decoration: none;
+.auth-blob-2 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 100, 80, 0.15) 0%, transparent 70%);
+  bottom: -5%;
+  right: 10%;
+  animation-delay: 3s;
 }
 
-.link:focus {
-    color: #00a278;
+.auth-blob-3 {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(0, 180, 130, 0.12) 0%, transparent 70%);
+  top: 40%;
+  right: -5%;
+  animation-delay: 1.5s;
 }
 
-.link:active {
-    color: #45c09f;
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(15px, -20px) scale(1.05); }
+  66% { transform: translate(-10px, 10px) scale(0.97); }
 }
 
-.link:visited {
-    color: #45c09f;
+/* ─── Center content ──────────────────────── */
+.auth-content {
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  z-index: 1;
 }
 
-/* .button {
-    background-color: #00a278 !important;
+/* ─── Glassmorphism Card ──────────────────── */
+.auth-card {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 162, 120, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.button:hover {
-    background-color: #00845c !important;
-} */
+/* ─── Brand mark inside card ─────────────── */
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
 
-@media screen and (min-width: 768px) {
-    .content {
-        justify-content: flex-end;
-    }
-    .form {
-        min-width: 24rem;
-    }
+.auth-brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00a278, #00c896);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 162, 120, 0.4);
+}
+
+.auth-brand-name {
+  color: #f1f5f9 !important;
+  letter-spacing: -0.02em;
+}
+
+/* ─── Title & Subtitle ──────────────────── */
+.auth-title {
+  color: #f1f5f9 !important;
+  font-size: 1.6rem !important;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.auth-subtitle {
+  color: #64748b !important;
+  margin-top: 0.25rem;
+}
+
+/* ─── Form Labels ────────────────────────── */
+.auth-label {
+  color: #94a3b8 !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.4rem;
+}
+
+/* ─── Mantine Input Dark Override (Auth pages only) ── */
+.auth-card .auth-input,
+.auth-card .mantine-TextInput-input,
+.auth-card .mantine-PasswordInput-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.auth-card .auth-input::placeholder,
+.auth-card .mantine-TextInput-input::placeholder,
+.auth-card .mantine-PasswordInput-input::placeholder {
+  color: #64748b !important;
+}
+
+.auth-card .auth-input:focus,
+.auth-card .mantine-TextInput-input:focus,
+.auth-card .mantine-PasswordInput-input:focus {
+  border-color: #00a278 !important;
+  box-shadow: 0 0 0 2px rgba(0, 162, 120, 0.2) !important;
+}
+
+/* ─── Submit Button ──────────────────────── */
+.auth-submit-btn {
+  background: linear-gradient(135deg, #00a278, #00c896) !important;
+  box-shadow: 0 4px 16px rgba(0, 162, 120, 0.35) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast) !important;
+}
+
+.auth-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 162, 120, 0.45) !important;
+}
+
+.auth-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* ─── Switch link ────────────────────────── */
+.auth-switch {
+  color: #64748b !important;
+}
+
+.auth-link {
+  color: #00a278 !important;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.auth-link:hover {
+  color: #00c896 !important;
+}
+
+/* ─── Responsive ─────────────────────────── */
+@media (min-width: 640px) {
+  .auth-card {
+    padding: 3rem 2.5rem;
+  }
 }

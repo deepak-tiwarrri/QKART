@@ -1,188 +1,171 @@
-import { Button, CircularProgress, Stack, TextField } from "@mui/material";
-import { Box } from "@mui/system";
-import axios from "axios";
-import { toast } from "react-toastify";
-import React, { useState } from "react";
-import { useHistory, Link } from "react-router-dom";
-import { config } from "../App";
+import { useState } from "react";
+import { Link, useHistory } from "react-router-dom";
+import { motion } from "framer-motion";
+import { toast as sonnerToast } from "sonner";
+import { toast as toastifyToast } from "react-toastify";
+import { TextInput, PasswordInput, Button, Stack, Text, Loader, Center } from "@mantine/core";
 import Footer from "./Footer";
 import Header from "./Header";
+import useAuthStore from "../stores/authStore";
+import { loginUser } from "../services/authService";
+import { authContainerVariants, authFieldVariants } from "../utils/animationVariants";
+import { createInputHandler } from "../utils/formUtils";
 import "./Login.css";
 
+const toast = {
+  success: (msg) => {
+    sonnerToast.success(msg);
+    toastifyToast.success(msg);
+  },
+  error: (msg) => {
+    sonnerToast.error(msg);
+    toastifyToast.error(msg);
+  },
+  warning: (msg) => {
+    sonnerToast.warning(msg);
+    toastifyToast.warning(msg);
+  },
+};
+
+// ─── Validation ──────────────────────────────────────────────────────────
+const validateInput = (data) => {
+  const username = data.username || data.email;
+  if (!username) {
+    toast.error("Username is a required field");
+    return false;
+  }
+  if (!data.password) {
+    toast.error("Password is a required field");
+    return false;
+  }
+  return true;
+};
+
+// ─── Login component ─────────────────────────────────────────────────────
 const Login = () => {
   const history = useHistory();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const { login } = useAuthStore();
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
 
-  const handleInput = (e) => {
-    const [key, value] = [e.target.name, e.target.value];
-    setFormData((nextFormData) => ({ ...nextFormData, [key]: value }));
-  };
+  const handleInput = createInputHandler(setFormData);
 
-  // TODO: CRIO_TASK_MODULE_LOGIN - Fetch the API response
-  /**
-   * Perform the Login API call
-   * @param {{ email: string, password: string }} formData
-   *  Object with values of username, password and confirm password user entered to register
-   *
-   * API endpoint - "POST /auth/login"
-   *
-   * Example for successful response from backend:
-   * HTTP 201
-   * {
-   *      "success": true,
-   *      "token": "testtoken",
-   *      "username": "criodo",
-   *      "balance": 5000
-   * }
-   *
-   * Example for failed response from backend:
-   * HTTP 400
-   * {
-   *      "success": false,
-   *      "message": "Password is incorrect"
-   * }
-   *
-   */
-  const login = async (formData) => {
+  const handleLogin = async () => {
     if (!validateInput(formData)) return;
     setLoading(true);
     try {
-      const response = await axios.post(`${config.endpoint}/auth/login`, formData);
-      console.log(`response from login:`, response);
-      const { user, tokens } = response?.data;
-      const { email, walletMoney } = user;
-      persistLogin(tokens?.access?.token, email, walletMoney);
-      setFormData({
-        email: "",
-        password: ""
-      });
-      setLoading(false);
+      const payload = {
+        username: formData.username,
+        password: formData.password,
+      };
+      const data = await loginUser(payload);
+      const token = data.token || data.tokens?.access?.token;
+      const username = data.username || data.user?.username || formData.username;
+      const balance = data.balance ?? data.user?.walletMoney ?? 0;
+
+      login(token, username, balance);
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", username);
+      localStorage.setItem("balance", balance);
+
+      setFormData({ username: "", password: "" });
       toast.success("Logged in successfully");
       history.push("/");
-    } catch (e) {
+    } catch (err) {
+      toast.error(err.message || "Login failed. Please try again.");
+    } finally {
       setLoading(false);
-      if (e.response && e.response.status === 400)
-        toast.error(e?.response?.data?.message);
-      else {
-        toast.error(e?.response?.data?.message);
-      }
     }
-  };
-
-  // TODO: CRIO_TASK_MODULE_LOGIN - Validate the input
-  /**
-   * Validate the input values so that any bad or illegal values are not passed to the backend.
-   *
-   * @param {{ email: string, password: string }} data
-   *  Object with values of username, password and confirm password user entered to register
-   *
-   * @returns {boolean}
-   *    Whether validation has passed or not
-   *
-   * Return false and show warning message if any validation condition fails, otherwise return true.
-   * (NOTE: The error messages to be shown for each of these cases, are given with them)
-   * -    Check that username field is not an empty value - "Username is a required field"
-   * -    Check that password field is not an empty value - "Password is a required field"
-   */
-  const validateInput = (data) => {
-    if (!data.email) {
-      toast.error("Email is a required field");
-      return false;
-    }
-    if (!data.password) {
-      toast.error("Password is a required field");
-      return false;
-    }
-    return true;
-  };
-
-  // TODO: CRIO_TASK_MODULE_LOGIN - Persist user's login information
-  /**
-   * Store the login information so that it can be used to identify the user in subsequent API calls
-   *
-   * @param {string} token
-   *    API token used for authentication of requests after logging in
-   * @param {string} username
-   *    Username of the logged in user
-   * @param {string} balance
-   *    Wallet balance amount of the logged in user
-   *
-   * Make use of localStorage: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
-   * -    `token` field in localStorage can be used to store the Oauth token
-   * -    `username` field in localStorage can be used to store the username that the user is logged in as
-   * -    `balance` field in localStorage can be used to store the balance amount in the user's wallet
-   */
-  const persistLogin = (token, email, balance) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("email", email);
-    localStorage.setItem("balance", balance);
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="space-between"
-      minHeight="100vh"
-    >
+    <div className="auth-page">
       <Header hasHiddenAuthButtons />
-      <Box className="content">
-        <Stack spacing={2} className="form">
-          <h2 className="title">Login</h2>
-          <TextField
-            id="email"
-            label="Email"
-            variant="outlined"
-            title="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleInput}
-            placeholder="Enter Email"
-            fullWidth
-          />
-          <TextField
-            id="password"
-            variant="outlined"
-            label="Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleInput}
-            fullWidth
-            placeholder="Enter a password"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                login(formData);
-              }
-            }}
-          />
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <CircularProgress size={25} color="primary" />
-            </Box>
-          ) : (
-            <Button
-              className="button"
-              variant="contained"
-              onClick={() => login(formData)}
-            >
-              Login to Qkart
-            </Button>
-          )}
-          <p>
-            Don't have an account?
-            <Link className="link" to="/register">
-              Register Now
-            </Link>
-          </p>
-        </Stack>
-      </Box>
+      <div className="auth-bg">
+        <div className="auth-blob auth-blob-1" />
+        <div className="auth-blob auth-blob-2" />
+        <div className="auth-blob auth-blob-3" />
+
+        <div className="auth-content">
+          <motion.div
+            className="auth-card"
+            variants={authContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {/* Brand mark */}
+            <motion.div variants={authFieldVariants} className="auth-brand">
+              <div className="auth-brand-icon">Q</div>
+              <Text size="xl" fw={700} className="auth-brand-name">QKart</Text>
+            </motion.div>
+
+            <motion.div variants={authFieldVariants}>
+              <h2 className="auth-title">Login</h2>
+              <Text size="sm" className="auth-subtitle">Sign in to continue shopping</Text>
+            </motion.div>
+
+            <Stack gap="md" mt="lg">
+              <motion.div variants={authFieldVariants}>
+                <TextInput
+                  id="username"
+                  label="Username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInput}
+                  placeholder="Enter Username"
+                  size="md"
+                  radius="md"
+                  classNames={{ input: "auth-input", label: "auth-label" }}
+                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                />
+              </motion.div>
+
+              <motion.div variants={authFieldVariants}>
+                <PasswordInput
+                  id="password"
+                  label="Password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInput}
+                  placeholder="Enter a password"
+                  size="md"
+                  radius="md"
+                  classNames={{ input: "auth-input", label: "auth-label" }}
+                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                />
+              </motion.div>
+
+              <motion.div variants={authFieldVariants}>
+                {loading ? (
+                  <Center h={46}>
+                    <Loader size="sm" color="teal" />
+                  </Center>
+                ) : (
+                  <Button
+                    fullWidth
+                    size="md"
+                    radius="md"
+                    color="teal"
+                    onClick={handleLogin}
+                    className="auth-submit-btn"
+                  >
+                    Login to QKart
+                  </Button>
+                )}
+              </motion.div>
+
+              <motion.div variants={authFieldVariants}>
+                <Text size="sm" ta="center" className="auth-switch">
+                  Don't have an account?{" "}
+                  <Link to="/register" className="auth-link">Register Now</Link>
+                </Text>
+              </motion.div>
+            </Stack>
+          </motion.div>
+        </div>
+      </div>
       <Footer />
-    </Box>
+    </div>
   );
 };
 

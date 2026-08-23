@@ -1,15 +1,15 @@
 var express = require("express");
 var router = express.Router();
-const { handleError, verifyAuth, getProduct } = require("../utils");
+const { handleError, verifyAuth, getProduct, sendResponse } = require("../utils");
 var { users, products } = require("../db");
 
-// Cart Controller
+// GET /cart — returns user's cart items
 router.get("/", verifyAuth, (req, res) => {
   console.log(`GET request to "/cart" received`);
-
-  return res.status(200).json(req.user.cart);
+  return sendResponse(res, 200, true, "Cart fetched successfully", req.user.cart);
 });
 
+// POST /cart — add or update item in cart
 router.post("/", verifyAuth, async (req, res) => {
   console.log(`POST request to "/cart" received`);
 
@@ -18,9 +18,7 @@ router.post("/", verifyAuth, async (req, res) => {
       return handleError(res, err);
     }
     if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product doesn't exist" });
+      return sendResponse(res, 404, false, "Product doesn't exist", null);
     }
 
     const index = await req.user.cart.findIndex(
@@ -33,32 +31,32 @@ router.post("/", verifyAuth, async (req, res) => {
         qty: req.body.qty,
       });
     } else if (req.body.qty === 0) {
-      // delete
+      // delete item
       req.user.cart.splice(index, 1);
     } else {
-      //modify
+      // modify qty
       req.user.cart[index].qty = req.body.qty;
     }
+
     users.update(
       { _id: req.user._id },
       { $set: { cart: req.user.cart } },
       {},
       (err) => {
         if (err) {
-          handleError(res, err);
+          return handleError(res, err);
         }
-
         console.log(
           `User ${req.user.username}'s cart updated to`,
           req.user.cart
         );
-
-        return res.status(200).json(req.user.cart);
+        return sendResponse(res, 200, true, "Cart updated successfully", req.user.cart);
       }
     );
   });
 });
 
+// POST /cart/checkout — place order
 router.post("/checkout", verifyAuth, async (req, res) => {
   console.log(
     `POST request received to "/cart/checkout": ${req.user.username}`
@@ -69,50 +67,40 @@ router.post("/checkout", verifyAuth, async (req, res) => {
     try {
       const product = await getProduct(element.productId);
       if (product == null) {
-        throw new Error("Invalid product in cart. ");
+        throw new Error("Invalid product in cart.");
       }
       total = total + element.qty * product.cost;
     } catch (error) {
-      handleError(res, error);
+      return handleError(res, error);
     }
   }
+
   if (total === 0) {
-    return res.status(400).json({ success: false, message: "Cart is empty" });
+    return sendResponse(res, 400, false, "Cart is empty", null);
   }
   if (req.user.balance < total) {
-    return res.status(400).json({
-      success: false,
-      message: "Wallet balance not sufficient to place order",
-    });
+    return sendResponse(res, 400, false, "Wallet balance not sufficient to place order", null);
   }
   if (!req.body.addressId) {
-    return res.status(400).json({
-      success: false,
-      message: "Address not set",
-    });
+    return sendResponse(res, 400, false, "Address not set", null);
   }
+
   const addressIndex = await req.user.addresses.findIndex(
     (element) => element._id === req.body.addressId
   );
   if (addressIndex === -1) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Bad address specified" });
+    return sendResponse(res, 404, false, "Bad address specified", null);
   }
+
   req.user.balance -= total;
-  console.log("Mock order placed");
-  console.log("Cart", req.user.cart);
-  console.log("Total cost", total);
-  console.log("Address", req.user.addresses[addressIndex]);
-  // Now clear cart
   req.user.cart = [];
+
   users.update({ _id: req.user._id }, req.user, {}, (err) => {
     if (err) {
-      handleError(res, err);
+      return handleError(res, err);
     }
-    return res.status(200).json({
-      success: true,
-    });
+    console.log("Order placed successfully");
+    return sendResponse(res, 200, true, "Order placed successfully", null);
   });
 });
 

@@ -1,38 +1,244 @@
-#add-new-btn {
-    text-transform: none;
-    font-weight: 700;
-    margin: 1rem 0;
-}
+/* ─────────────────────────────────────────────
+   CHECKOUT — Glassmorphism Shipping & Payment
+───────────────────────────────────────────── */
 
-.address-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    margin: 1rem 0;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
+/* ─── Page Layout ─────────────────────────── */
 .shipping-container {
-    padding: 2rem 1rem;
-}
-
-.selected {
-    border: 1px solid #00A278;
-    background-color: #E9F5E1;
-}
-
-.not-selected {
-    border: 1px solid #ddd;
-}
-
-p {
-    color: #3C3C3C;
+  padding: 2rem 1.5rem;
 }
 
 @media screen and (min-width: 768px) {
-    .shipping-container {
-        padding: 2rem 4rem;
-    }
+  .shipping-container {
+    padding: 2.5rem 3rem;
+  }
+}
+
+/* ─── Section Headers ─────────────────────── */
+.section-title {
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  color: var(--color-text) !important;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #00a278, #00c896);
+  border-radius: 2px;
+}
+
+.section-subtitle {
+  color: var(--color-text-muted) !important;
+  font-size: 0.9rem !important;
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+.section-divider {
+  margin-bottom: 1.5rem !important;
+  border-color: var(--color-border) !important;
+}
+
+/* ─── Address Card — Glassmorphism ─────────── */
+.address-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow var(--transition-base),
+    border-color var(--transition-base),
+    background var(--transition-base);
+}
+
+[data-mantine-color-scheme="dark"] .address-card {
+  background: rgba(17, 24, 39, 0.65);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+/* Selected address — teal glow ring */
+.address-card--selected {
+  border-color: #00a278 !important;
+  box-shadow: var(--shadow-teal-ring) !important;
+  background: rgba(0, 162, 120, 0.06) !important;
+}
+
+[data-mantine-color-scheme="dark"] .address-card--selected {
+  background: rgba(0, 162, 120, 0.08) !important;
+}
+
+.address-selected-badge {
+  position: absolute;
+  top: -8px;
+  right: 12px;
+}
+
+.address-text {
+  color: var(--color-text) !important;
+  line-height: 1.5;
+  flex: 1;
+  padding-right: 0.5rem;
+}
+
+.address-delete-btn {
+  color: #ef4444 !important;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast) !important;
+  text-transform: none !important;
+  font-size: 0.8rem !important;
+}
+
+.address-delete-btn:hover {
+  opacity: 1;
+}
+
+/* ─── No address state ────────────────────── */
+.no-address-text {
+  color: var(--color-text-muted) !important;
+  padding: 1rem 0;
+  font-style: italic;
+}
+
+/* ─── Add new address form ────────────────── */
+.new-address-form {
+  margin: 1rem 0;
+  padding: 1.25rem;
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(12px);
+}
+
+[data-mantine-color-scheme="dark"] .new-address-form {
+  background: rgba(17, 24, 39, 0.6);
+}
+
+.checkout-input {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast) !important;
+}
+
+.checkout-input::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+.checkout-input:focus {
+  border-color: #00a278 !important;
+  box-shadow: 0 0 0 2px rgba(0, 162, 120, 0.2) !important;
+}
+
+[data-mantine-color-scheme="dark"] .checkout-input {
+  background: rgba(17, 24, 39, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--color-text) !important;
+}
+
+/* ─── Buttons ─────────────────────────────── */
+#add-new-btn,
+.add-address-btn {
+  text-transform: none !important;
+  font-weight: 600 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  border-radius: var(--radius-md) !important;
+  background: linear-gradient(135deg, #00a278, #00ba8a) !important;
+  box-shadow: 0 4px 16px rgba(0, 162, 120, 0.3) !important;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast) !important;
+}
+
+.add-address-btn:hover {
+  box-shadow: 0 6px 20px rgba(0, 162, 120, 0.45) !important;
+  transform: translateY(-1px);
+}
+
+.cancel-btn {
+  color: var(--color-text-muted) !important;
+  text-transform: none !important;
+}
+
+/* ─── Wallet / Payment Section ────────────── */
+.wallet-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0 1.5rem;
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(12px);
+}
+
+[data-mantine-color-scheme="dark"] .wallet-section {
+  background: rgba(17, 24, 39, 0.6);
+}
+
+.wallet-icon-wrap {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.wallet-label {
+  color: var(--color-text) !important;
+}
+
+.wallet-amount {
+  color: var(--color-text-muted) !important;
+  margin-top: 0.15rem;
+}
+
+.wallet-balance {
+  color: var(--color-teal-500);
+}
+
+/* ─── Place Order Button ──────────────────── */
+.place-order-btn {
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  padding: 0.75rem 2rem !important;
+  border-radius: var(--radius-md) !important;
+  background: linear-gradient(135deg, #00a278, #00ba8a) !important;
+  box-shadow: 0 4px 20px rgba(0, 162, 120, 0.4) !important;
+  transition:
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast) !important;
+}
+
+.place-order-btn:hover {
+  box-shadow: 0 8px 28px rgba(0, 162, 120, 0.55) !important;
+  transform: translateY(-2px);
+}
+
+/* ─── Checkout Cart Column ────────────────── */
+.checkout-cart-col {
+  background: var(--color-surface-2);
+  padding: 1.5rem 1rem;
+  border-left: 1px solid var(--color-border);
+  min-height: 100vh;
+}
+
+[data-mantine-color-scheme="dark"] .checkout-cart-col {
+  background: rgba(10, 15, 26, 0.5);
 }
