@@ -10,22 +10,19 @@ const { password } = require("./custom.validation");
  */
 const register = {
   body: Joi.object().keys({
-    email: Joi.string().trim().email({ tlds: { allow: false } }),
+    username: Joi.string().trim().optional(),
+    email: Joi.string().trim().email({ tlds: { allow: false } }).optional(),
     password: Joi.string().custom(password).required(),
-    name: Joi.string().trim().allow('',null).optional(),
+    name: Joi.string().trim().allow('', null).optional(),
   }),
 };
 
-/**
- * Check request *body* for fields (all are *required*)
- * - "email" : string and satisyfing email structure
- * - "password": string and satisifes the custom password structure defined in "src/validations/custom.validation.js"
- */
 const login = {
-  body:Joi.object().keys({
-    email:Joi.string().trim().email({tlds:{allow:false}}).required(),
-    password:Joi.string().custom(password).required()
-  })
+  body: Joi.object().keys({
+    username: Joi.string().trim().optional(),
+    email: Joi.string().trim().email({ tlds: { allow: false } }).optional(),
+    password: Joi.string().custom(password).required(),
+  }),
 };
 
 module.exports = {

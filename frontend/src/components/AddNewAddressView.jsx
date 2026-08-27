@@ -23,13 +23,13 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, onAdd }) => {
       transition={{ duration: 0.2 }}
     >
       <div className="new-address-form">
-        <Textarea
-          minRows={3}
-          placeholder="Enter your complete address (min 20 characters)"
+        <textarea
+          rows={3}
+          placeholder="Enter your complete address"
+          value={newAddress.value || ""}
           onChange={handleChange}
-          size="md"
-          radius="md"
-          classNames={{ input: "checkout-input" }}
+          className="checkout-input"
+          style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid var(--color-border)", fontSize: "14px", fontFamily: "inherit", resize: "vertical" }}
         />
         <Stack direction="row" gap="sm" mt="sm" style={{ display: "flex" }}>
           <Button
@@ -38,7 +38,7 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, onAdd }) => {
             className="add-address-btn"
             onClick={onAdd}
           >
-            Add Address
+            Add
           </Button>
           <Button
             variant="text"

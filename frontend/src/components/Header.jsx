@@ -25,7 +25,10 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
 
-  const { email, logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
+  const storeEmail = useAuthStore((s) => s.email);
+  const email = storeEmail || (typeof window !== "undefined" ? localStorage.getItem("username") || localStorage.getItem("email") : null);
+
   const items = useCartStore((s) => s.items);
   const cartCount = items.reduce((sum, i) => sum + (i.qty || 0), 0);
 
@@ -39,6 +42,12 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
 
   const logOut = () => {
     logout();
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("username");
+      localStorage.removeItem("token");
+      localStorage.removeItem("balance");
+      localStorage.removeItem("email");
+    }
     history.push("/login");
   };
 
@@ -75,7 +84,7 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
 
       {email ? (
         <>
-          <Avatar radius="xl" size="sm" alt={email} src={null} name={email} color="teal" />
+          <img src="avatar.png" alt={email} style={{ width: 32, height: 32, borderRadius: "50%" }} />
           <Text className="username-text" size="sm" fw={500}>{email}</Text>
           <Button variant="subtle" color="gray" radius="xl" onClick={logOut} size="sm">
             Logout

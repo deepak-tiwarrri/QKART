@@ -59,6 +59,7 @@ const Login = () => {
         password: formData.password,
       };
       const data = await loginUser(payload);
+      console.log()
       const token = data.token || data.tokens?.access?.token;
       const username = data.username || data.user?.username || formData.username;
       const balance = data.balance ?? data.user?.walletMoney ?? 0;

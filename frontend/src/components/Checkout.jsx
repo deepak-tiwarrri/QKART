@@ -19,7 +19,9 @@ import apiClient from "../lib/apiClient";
 
 // ─── Checkout component ───────────────────────────────────────────────────
 const Checkout = () => {
-  const { token, updateBalance } = useAuthStore();
+  const storeToken = useAuthStore((s) => s.token);
+  const token = storeToken || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  const { updateBalance } = useAuthStore();
   const history = useHistory();
   const [items, setItems] = useState([]);
   const [products, setProducts] = useState([]);
@@ -171,7 +173,7 @@ const Checkout = () => {
             </Box>
 
             {/* Add new address toggle */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               {!newAddress.isAddingNewAddress ? (
                 <motion.div
                   key="add-btn"

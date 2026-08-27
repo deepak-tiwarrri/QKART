@@ -15,7 +15,7 @@ export const getAddresses = async () => {
 };
 
 /**
- * Add a new shipping address
+ * Add a new shipping addressenv
  * @param {string} address - Full address string (20-128 chars)
  * @returns {Promise<Array<{ _id: string, address: string }>>}
  */
