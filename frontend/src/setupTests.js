@@ -1,6 +1,9 @@
 import "@testing-library/jest-dom";
 import React from "react";
 import { MantineProvider } from "@mantine/core";
+import { MotionGlobalConfig } from "framer-motion";
+
+MotionGlobalConfig.skipAnimations = true;
 
 // Mock window.matchMedia for JSDOM
 window.matchMedia = (query) => ({

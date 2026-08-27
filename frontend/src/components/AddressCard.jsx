@@ -21,7 +21,6 @@ const AddressCard = ({ data, isSelected, onSelect, onDelete }) => (
     transition={{ type: "spring", stiffness: 300, damping: 28 }}
     className={`address-card ${isSelected ? "address-card--selected" : ""}`}
     onClick={onSelect}
-    role="button"
     tabIndex={0}
   >
     {isSelected && (

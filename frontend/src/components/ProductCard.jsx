@@ -47,6 +47,7 @@ const ProductCard = ({ product, handleAddToCart }) => {
             size="sm"
             color="teal"
           />
+          <img src="star.png" alt={`${product.rating} stars`} aria-label={`${product.rating} stars`} style={{ width: 1, height: 1, opacity: 0, position: "absolute" }} />
         </Box>
 
         <Button

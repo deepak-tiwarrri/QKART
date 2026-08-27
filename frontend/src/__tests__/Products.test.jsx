@@ -216,7 +216,7 @@ describe("Products Page", () => {
     expect(search).toHaveValue("smash");
 
     await act(async () => {
-      vi.runAllTimers();
+      vi.advanceTimersByTime(1000);
     });
 
     const searchCall = mock.history.get.find(
@@ -235,7 +235,7 @@ describe("Products Page", () => {
     userEvent.type(search, "");
 
     await act(async () => {
-      vi.runAllTimers();
+      vi.advanceTimersByTime(1000);
     });
 
     const addToCartBtn = screen.queryAllByRole("button", {
@@ -266,7 +266,7 @@ describe("Products Page", () => {
     userEvent.type(search, "smash");
 
     await act(async () => {
-      vi.runAllTimers();
+      vi.advanceTimersByTime(1000);
     });
 
     const text = screen.getByText(/YONEX Smash Badminton Racquet/);
@@ -289,7 +289,7 @@ describe("Products Page", () => {
     userEvent.type(search, "smasher");
 
     await act(async () => {
-      vi.runAllTimers();
+      vi.advanceTimersByTime(1000);
     });
 
     const searchCall = mock.history.get.find(
@@ -351,7 +351,7 @@ describe("Products Page", () => {
     userEvent.type(search, "leather");
 
     await act(async () => {
-      vi.runAllTimers();
+      vi.advanceTimersByTime(1000);
     });
 
     expect(
@@ -369,7 +369,7 @@ describe("Products Page", () => {
     expect(search).toHaveValue("leathere");
 
     await act(async () => {
-      vi.runAllTimers();
+      vi.advanceTimersByTime(1000);
     });
 
     expect(item2).not.toBeInTheDocument();
@@ -411,7 +411,7 @@ describe("Products Page", () => {
     expect(searchCall).toBeFalsy();
 
     await act(async () => {
-      vi.runAllTimers();
+      vi.advanceTimersByTime(1000);
     });
 
     const searchCall2 = mock.history.get.find(

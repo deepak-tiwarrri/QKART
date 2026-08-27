@@ -42,7 +42,7 @@ describe("Cart test", () => {
       // Mock Cart.save() function
       let saveMock = (...args) => {
         expect(args[0].cartItems.length).toEqual(1);
-        expect(args[0].cartItems[0].product._id).toEqual(productOne._id);
+        expect(args[0].cartItems[0].product._id.toString()).toEqual(productOne._id.toString());
         return args[0];
       };
       mockingoose(Cart).toReturn(saveMock, "save");
