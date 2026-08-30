@@ -3,7 +3,7 @@ import { Button, Divider, Grid } from "@mui/material";
 import { Box } from "@mui/system";
 import { Text } from "@mantine/core";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
+import toast from "../utils/toast";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import Cart, { getTotalCartValue, generateCartItemsFrom } from "./Cart";
@@ -71,7 +71,7 @@ const Checkout = () => {
 
       try {
         const addressData = await getAddresses();
-        setAddresses({ all: addressData, selected: addressData[0]?._id || "" });
+        setAddresses({ all: addressData, selected: "" });
       } catch {
         toast.error("Could not fetch addresses.");
       }
@@ -173,38 +173,27 @@ const Checkout = () => {
             </Box>
 
             {/* Add new address toggle */}
-            <AnimatePresence>
-              {!newAddress.isAddingNewAddress ? (
-                <motion.div
-                  key="add-btn"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    id="add-new-btn"
-                    size="large"
-                    startIcon={<AddLocation />}
-                    className="add-address-btn"
-                    onClick={() =>
-                      setNewAddress((curr) => ({ ...curr, isAddingNewAddress: true }))
-                    }
-                  >
-                    Add new address
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div key="add-form">
-                  <AddNewAddressView
-                    newAddress={newAddress}
-                    handleNewAddress={setNewAddress}
-                    onAdd={handleAddAddress}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {!newAddress.isAddingNewAddress ? (
+              <Button
+                color="primary"
+                variant="contained"
+                id="add-new-btn"
+                size="large"
+                startIcon={<AddLocation />}
+                className="add-address-btn"
+                onClick={() =>
+                  setNewAddress((curr) => ({ ...curr, isAddingNewAddress: true }))
+                }
+              >
+                Add new address
+              </Button>
+            ) : (
+              <AddNewAddressView
+                newAddress={newAddress}
+                handleNewAddress={setNewAddress}
+                onAdd={handleAddAddress}
+              />
+            )}
 
             {/* Payment Section */}
             <motion.div

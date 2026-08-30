@@ -11,7 +11,7 @@ app.use(cors());
 
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(()=>{
     console.log("Connected to DB at ",config.mongoose.url);
-},{ useNewUrlParser: true }).catch((error)=>{
+}).catch((error)=>{
     console.log("Failed to connect to DB at",error);
 });
 app.use(express.json());

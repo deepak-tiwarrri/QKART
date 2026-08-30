@@ -28,12 +28,18 @@ if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
+// The MONGODB_URL in .env already has the database name (qkart) and URL-encoded password.
+// For test mode we just append -test to the db name.
+const mongoUrl = envVars.NODE_ENV === "test"
+  ? envVars.MONGODB_URL.replace(/\/([a-zA-Z0-9_-]+)(\?|$)/, "/$1-test$2")
+  : envVars.MONGODB_URL;
+
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   // Set mongoose configuration
   mongoose: {
-    url: envVars.MONGODB_URL + (envVars.NODE_ENV === "test" ? "-test" : ""),
+    url: mongoUrl,
     options: {
       useCreateIndex: true,
       useNewUrlParser: true,
