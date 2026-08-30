@@ -6,6 +6,7 @@ services:
     buildCommand: npm install
     startCommand: npm start
     plan: free
+    nodeVersion: 18.20.4
     healthCheckPath: /v1/products
     envVars:
       - key: NODE_ENV
