@@ -27,4 +27,7 @@ testReport.json
 
 package-lock.json
 pnpm-lock.yaml
+*.env
+.env.local
+.env.development
 
