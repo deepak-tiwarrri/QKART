@@ -131,3 +131,4 @@ db/users.db
 yarn.lock
 /node_modules
 setupRemoteMongo.sh
+*.env
